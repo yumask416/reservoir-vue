@@ -5,7 +5,7 @@
                 <div class="title">
                     <div class="curent-msg">
                         <div class="msg-box" style="width: 40%">
-                            <span>当前巡航线：</span><span>巡航线1</span>
+                            <span>当前巡航线：</span><span>{{CruiseLine}}</span>
                         </div>
                         <div class="msg-box" style="width: 60%">
                             <span>当前预置点：</span><span>东南角预置点</span>
@@ -78,7 +78,7 @@
                     <div class="default-list">
                         <div class="select-title">
                             <div class="arrow"><i class="el-icon-caret-left"></i></div>
-                            <h3>巡航线1</h3>
+                            <h3>{{CruiseLine}}</h3>
                             <div class="arrow"><i class="el-icon-caret-right"></i></div>
                         </div>
                         <div class="selected-list">
@@ -92,14 +92,14 @@
                                             <span v-show="!scope.row.show">{{ scope.row.token }}</span>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="name" label="预设点名称" show-overflow-tooltip>
+                                    <el-table-column prop="name" label="预设点名称" width="90" show-overflow-tooltip>
                                         <template slot-scope="scope">
                                             <el-input size="small" v-model="scope.row.name" v-show="scope.row.show"
                                                 placeholder="请输入内容" class="el-input-padding"></el-input>
                                             <span v-show="!scope.row.show">{{ scope.row.name }}</span>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="ai" label="算法" show-overflow-tooltip>
+                                    <el-table-column prop="ai" label="算法"  show-overflow-tooltip>
                                     </el-table-column>
                                     <el-table-column label="操作">
                                         <template slot-scope="scope">
@@ -156,16 +156,22 @@
                     <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
                 </div>
                 <div class="ctrl-botton">
+
+                    <div class="button" @click="addCruiseLine()"><span>添加巡航线</span></div>
+                    <div class="button" @click="downSendTrackIdpara()"><span>更改跟踪参数</span></div>
+                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
+
+                </div>
+                <div class="ctrl-bottons">
                     <div class="bottons-suodinginput">
-                        <el-select size="small" v-model="choosetrackmodule" placeholder="选择跟踪方式">
+                        <el-select size="small" v-model="choosetrackmodule" placeholder="选择跟踪方式" clearable>
                             <el-option v-for="item in choosetrackoptions" :key="item.value" :label="item.label"
                                 :value="item.value"></el-option>
                         </el-select>
                     </div>
                     <div class="bottons-suodinginput">
-                        <el-input size="small" v-model="autotrackid" placeholder="请输入跟踪ID"></el-input>
+                        <el-input size="small" v-model="autotrackid" placeholder="请输入跟踪ID" clearable></el-input>
                     </div>
-                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
                 </div>
                 <div class="PTZ-botton">
                     <div class="bottons-box">
@@ -250,15 +256,15 @@
 </template>
 <script >
 import $ from "jquery";
-// import flv from "flv.js";
+import flv from "flv.js";
 import {
-  ptzsendControl,
-  ptzinitControl,
-  ptzpresetControl,
-  ptzipControl,
-  ptzadd,
-  getlist,
-  ptzdownControl,
+    ptzsendControl,
+    ptzinitControl,
+    ptzpresetControl,
+    ptzipControl,
+    ptzadd,
+    getlist,
+    ptzdownControl,
 } from "@/service/api/camera.js";
 export default {
     name: "PTZmanage",
@@ -271,6 +277,7 @@ export default {
                 warningimgpath3: "../../static/images/camera_default.png",
                 warningimgpath4: "../../static/images/camera_default.png"
             },
+            CruiseLine:'巡航线1',
             WarningImgIndex: [false, false, false, false],
             ws: null, //建立的连接
             lockReconnect: false, //是否真正建立连接
@@ -621,6 +628,7 @@ export default {
         editPreset(row) {
             row.show = true;
         },
+        // 增加预置点
         printPreset() {
             ptzpresetControl({ ptzpreset: "getpreset" }).then((res) => {
                 if (res.code == 2200) {
@@ -751,7 +759,7 @@ export default {
         },
 
         notify: function (title, msg, err_type) {
-            Notification({ title: title, message: msg, type: err_type });
+            new Notification({ title: title, message: msg, type: err_type });
         },
         initWebSocket() {
             try {
@@ -1185,7 +1193,7 @@ export default {
 
 .right .right-bottom .ctrl-botton {
     width: 100%;
-    height: 15%;
+    height: 13%;
     background-color: #041e2b;
     display: flex;
     flex-direction: row;
@@ -1197,6 +1205,7 @@ export default {
     width: 30%;
     height: 80%;
     color: #fff;
+    border-radius: 3px;
     background-color: #0b3d51;
     display: flex;
     flex-direction: row;
@@ -1208,6 +1217,17 @@ export default {
 .right .right-bottom .ctrl-botton .button:hover {
     color: #00b0f0;
     background-color: #15718e;
+}
+.right .right-bottom .ctrl-bottons {
+    width: 100%;
+    height: 11%;    
+    background-color: #041e2b;
+    padding-top: 1%;
+    display: flex;
+    /* flex-direction: row; */
+    justify-content: space-around;
+    /* flex: 1; */
+    /* align-items: center; */
 }
 
 .right .right-bottom .PTZ-botton {
@@ -1222,11 +1242,11 @@ export default {
     /* background-color: #00b0f0; */
 }
 
-.right .right-bottom .ctrl-botton .bottons-suodinginput {
-    width: 30%;
-    height: 100%;
+.right .right-bottom .ctrl-bottons .bottons-suodinginput {
+    width: 45%;
+    /* height: 100%; */
     float: left;
-    padding-top: 5%;
+    /* padding-top: 5%; */
 }
 
 .right .right-bottom .PTZ-botton .bottons-box .title {
@@ -1303,43 +1323,51 @@ export default {
 }
 
 .bottons-right-one {
-    width: 93%;
-    padding-left: 3%;
+    /* width: 100%; */
+    /* padding-right: 5%; */
     padding-top: 4%;
     float: left;
 }
 
 .right .right-bottom .bottons-right-two {
-    width: 93%;
+    /* height: 100%; */
+    width: 100%;
     float: left;
-    padding-top: 5%;
-    background-color: #041e2b;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
+    padding-top: 4%;
+    /* background-color: #041e2b; */
+    /* display: flex; */
+    /* flex-direction: row; */
+    /* justify-content: space-around; */
+    /* align-items: center; */
 }
 
 .right .right-bottom .bottons-right-two .button-two {
-    width: 80%;
-    height: 70%;
+    /* width: 80%; */
+    /* height: 80%; */
+    padding: 1.5% 0;
     color: #fff;
     background-color: #0b3d51;
-    display: flex;
+    border-radius: 3px;
+    text-align: center;
+    /* display: flex;
     flex-direction: row;
     justify-content: space-around;
-    align-items: center;
+    align-items: center; */
     cursor: pointer;
 }
 
 .bottons-left {
     width: 45%;
     float: left;
+    padding-left: 3%;
+    /* background-color: #00b0f0; */
 }
 
 .bottons-right {
-    width: 54%;
-    float: left;
+    width: 45%;
+    float: right;
+    padding-right: 2.5%;
+    /* background-color: #fff; */
 }
 
 .left .left-top .bigimg .img-div {
