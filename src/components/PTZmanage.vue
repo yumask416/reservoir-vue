@@ -250,7 +250,7 @@
 </template>
 <script >
 import $ from "jquery";
-// import flv from "flv.js";
+import flv from "flv.js";
 import {
   ptzsendControl,
   ptzinitControl,
