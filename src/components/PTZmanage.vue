@@ -251,15 +251,15 @@
 <script >
 import $ from "jquery";
 // import flv from "flv.js";
-// import {
-//   ptzsendControl,
-//   ptzinitControl,
-//   ptzpresetControl,
-//   ptzipControl,
-//   ptzadd,
-//   getlist,
-//   ptzdownControl,
-// } from "@/service/api/camera";
+import {
+  ptzsendControl,
+  ptzinitControl,
+  ptzpresetControl,
+  ptzipControl,
+  ptzadd,
+  getlist,
+  ptzdownControl,
+} from "@/service/api/camera.js";
 export default {
     name: "PTZmanage",
     data() {
