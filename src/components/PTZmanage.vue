@@ -1,0 +1,1355 @@
+<template>
+    <div class="content">
+        <div class="left">
+            <div class="left-top">
+                <div class="title">
+                    <div class="curent-msg">
+                        <div class="msg-box" style="width: 40%">
+                            <span>当前巡航线：</span><span>巡航线1</span>
+                        </div>
+                        <div class="msg-box" style="width: 60%">
+                            <span>当前预置点：</span><span>东南角预置点</span>
+                        </div>
+                    </div>
+                    <h3>云台时况</h3>
+                </div>
+                <div class="bigimg">
+                    <div class="switch">
+                        <el-switch style="display: block" v-model="isBigImg" active-color="#409EFF"
+                            inactive-color="#409EFF" active-text="大图模式" inactive-text="信息模式">
+                        </el-switch>
+                    </div>
+                    <div class="allimg" v-show="!isBigImg">
+                        <img src="../../static/images/camera_default.png" alt="" />
+                    </div>
+                    <div class="img-div">
+                        <img :src="ImgInfo.imgPath" class="image-img" alt="" width="100%" height="100%">
+                    </div>
+                    <!-- <div class="warn-msg" v-show="!isBigImg">
+                        <div class="msg-text" style="color: red">
+                            <span>是否检测到打电话：</span><span>是</span>
+                        </div>
+                        <div class="msg-text" style="color: red">
+                            <span>是否检测到危险入侵：</span><span>是</span>
+                        </div>
+                        <div class="msg-text">
+                            <span>是否检测到明火：</span><span>否</span>
+                        </div>
+                    </div> -->
+                </div>
+                <!-- <div class="left-mid">
+                    <div class="mid-box">
+                        <template>
+                        <el-checkbox-group v-model="checkList">
+                            <el-checkbox label="打电话" @change="ClickConfig(2)" />
+                            <el-checkbox label="抽烟" />
+                            <el-checkbox label="明火" />
+                            <el-checkbox label="烟雾" />
+                            <el-checkbox label="灭火器" />
+                        </el-checkbox-group>
+                        </template>
+                    </div>
+                </div> -->
+            </div>
+
+            <div class="left-bottom">
+                <div class="title">
+                    <h3>事件列表</h3>
+                </div>
+                <div class="event-img-list">
+                    <div class="img-box">
+                        <img :src="WarningImgInfo.warningimgpath1" alt="" />
+                    </div>
+                    <div class="img-box">
+                        <img :src="WarningImgInfo.warningimgpath2" alt="" />
+                    </div>
+                    <div class="img-box">
+                        <img :src="WarningImgInfo.warningimgpath3" alt="" />
+                    </div>
+                    <div class="img-box">
+                        <img :src="WarningImgInfo.warningimgpath4" alt="" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="right-top">
+                <div class="center-box">
+                    <div class="default-list">
+                        <div class="select-title">
+                            <div class="arrow"><i class="el-icon-caret-left"></i></div>
+                            <h3>巡航线1</h3>
+                            <div class="arrow"><i class="el-icon-caret-right"></i></div>
+                        </div>
+                        <div class="selected-list">
+                            <div class="table">
+                                <el-table :data="presetinfotableData" tooltip-effect="dark" :cell-style="tableRowStyle"
+                                    :header-cell-style="tableHeaderColor" style="width: 100%">
+                                    <el-table-column prop="token" label="ID" width="50" show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            <el-input size="small" v-model="scope.row.token" v-show="scope.row.show"
+                                                placeholder="请输入内容" class="el-input-padding"></el-input>
+                                            <span v-show="!scope.row.show">{{ scope.row.token }}</span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="name" label="预设点名称" show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            <el-input size="small" v-model="scope.row.name" v-show="scope.row.show"
+                                                placeholder="请输入内容" class="el-input-padding"></el-input>
+                                            <span v-show="!scope.row.show">{{ scope.row.name }}</span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="ai" label="算法" show-overflow-tooltip>
+                                    </el-table-column>
+                                    <el-table-column label="操作">
+                                        <template slot-scope="scope">
+                                            <el-tooltip class="item" effect="dark" content="调用" placement="top">
+                                                <i class="el-icon-position" style="cursor: pointer"
+                                                    @click="gotoPreset(scope.row)"></i>
+                                            </el-tooltip>
+                                            <el-tooltip class="item" effect="dark" content="保存" placement="top">
+                                                <i class="el-icon-document-copy" style="cursor: pointer"
+                                                    @click="savePreset(scope.row), printPreset(), downsendPreset(scope.row)"></i>
+                                            </el-tooltip>
+                                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                                <i class="el-icon-delete-solid" style="cursor: pointer"
+                                                    @click="deletePreset(scope.row), printPreset()"></i>
+                                            </el-tooltip>
+                                            <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                                <i class="el-icon-s-claim" style="cursor: pointer"
+                                                    @click="editPreset(scope.row)"></i>
+                                            </el-tooltip>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-bottom">
+                <!-- <div class="table-add" @click="savePreset(),printPreset()">
+                    <i class="el-icon-plus">
+                    </i> 添加
+                </div> -->
+                <div class="ctrl-botton">
+                    <div class="button" @click="printPreset(), dialogPresetVisible = true"><span>增加预置点</span></div>
+                    <el-dialog title="增加预置点" :visible.sync="dialogPresetVisible" width="80%">
+                        <div class="add_preset_style">
+                            <el-input v-model="preset_token" placeholder="预置点ID"></el-input>
+                        </div>
+                        <div class="add_preset_style">
+                            <el-input v-model="preset_name" placeholder="预置点名称"></el-input>
+                        </div>
+                        <div class="add_preset_style">
+                            <el-select v-model="preset_ai" multiple placeholder="预置点算法">
+                                <el-option v-for="item in AIalgorithm" :key="item.value" :label="item.label"
+                                    :value="item.label"></el-option>
+                            </el-select>
+                        </div>
+                        <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogPresetVisible = false">取 消</el-button>
+                            <el-button type="primary" @click="addPreset(), dialogPresetVisible = false">确 定</el-button>
+                        </span>
+                    </el-dialog>
+                    <div class="button" @click="printPreset()"><span>显示预置点</span></div>
+                    <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
+                </div>
+                <div class="ctrl-botton">
+                    <div class="bottons-suodinginput">
+                        <el-select size="small" v-model="choosetrackmodule" placeholder="选择跟踪方式">
+                            <el-option v-for="item in choosetrackoptions" :key="item.value" :label="item.label"
+                                :value="item.value"></el-option>
+                        </el-select>
+                    </div>
+                    <div class="bottons-suodinginput">
+                        <el-input size="small" v-model="autotrackid" placeholder="请输入跟踪ID"></el-input>
+                    </div>
+                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
+                </div>
+                <div class="PTZ-botton">
+                    <div class="bottons-box">
+                        <!-- <div class="title">
+              <el-divider direction="vertical"></el-divider>
+              <span>云台</span>
+            </div> -->
+                        <div class="bottons">
+                            <div class="bottons-left">
+                                <div class="row">
+                                    <div class="item" @mousedown="ControlPTZ('q')" @mouseup="ControlStop()">
+                                        <img src="../../static/images/Icon/top-left.png" alt="" />
+                                    </div>
+                                    <div class="item" @mousedown="ControlPTZ('w')" @mouseup="ControlStop()">
+                                        <i class="el-icon-caret-top"></i>
+                                    </div>
+                                    <div class="item" @mousedown="ControlPTZ('e')" @mouseup="ControlStop()">
+                                        <img src="../../static/images/Icon/top-right.png" alt="" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="item" @mousedown="ControlPTZ('a')" @mouseup="ControlStop()">
+                                        <i class="el-icon-caret-left"></i>
+                                    </div>
+                                    <div class="item">
+                                        <img src="../../static/images/Icon/center.png" alt="" />
+                                    </div>
+                                    <div class="item" @mousedown="ControlPTZ('d')" @mouseup="ControlStop()">
+                                        <i class="el-icon-caret-right"></i>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="item" @mousedown="ControlPTZ('z')" @mouseup="ControlStop()">
+                                        <img src="../../static/images/Icon/bottom-left.png" alt="" />
+                                    </div>
+                                    <div class="item" @mousedown="ControlPTZ('x')" @mouseup="ControlStop()">
+                                        <i class="el-icon-caret-bottom"></i>
+                                    </div>
+                                    <div class="item" @mousedown="ControlPTZ('c')" @mouseup="ControlStop()">
+                                        <img src="../../static/images/Icon/bottom-right.png" alt="" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="item" @mousedown="ControlPTZ('2')" @mouseup="ControlStop()">
+                                        <i class="el-icon-minus"></i>
+                                    </div>
+                                    <div class="items"><i class="el-icon-back"></i></div>
+                                    <div class="items"><span>焦距</span></div>
+                                    <div class="items"><i class="el-icon-right"></i></div>
+                                    <div class="item" @mousedown="ControlPTZ('1')" @mouseup="ControlStop()">
+                                        <i class="el-icon-plus"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bottons-right">
+                                <div class="bottons-right-one">
+                                    <el-input size="small" v-model="ptzconfig.ip" placeholder="IP"></el-input>
+                                </div>
+                                <div class="bottons-right-one">
+                                    <el-input size="small" v-model="ptzconfig.username" placeholder="IPC用户名"></el-input>
+                                </div>
+                                <div class="bottons-right-one">
+                                    <el-input size="small" v-model="ptzconfig.password" placeholder="IPC密码"></el-input>
+                                </div>
+                                <div class="bottons-right-two">
+                                    <div class="button-two" @click="GetUrlPTZ()">
+                                        <span>添加球机</span>
+                                    </div>
+                                </div>
+                                <div class="bottons-right-two">
+                                    <div class="button-two" @click="ListCamera()">
+                                        <span>删除球机</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script >
+import $ from "jquery";
+// import flv from "flv.js";
+import {
+  ptzsendControl,
+  ptzinitControl,
+  ptzpresetControl,
+  ptzipControl,
+  ptzadd,
+  getlist,
+  ptzdownControl,
+} from "@/api/camera";
+export default {
+    name: "PTZmanage",
+    data() {
+        return {
+            ImgInfo: { imgPath: "/static/images/camera_default.png" },
+            WarningImgInfo: {
+                warningimgpath1: "../../static/images/camera_default.png",
+                warningimgpath2: "../../static/images/camera_default.png",
+                warningimgpath3: "../../static/images/camera_default.png",
+                warningimgpath4: "../../static/images/camera_default.png"
+            },
+            WarningImgIndex: [false, false, false, false],
+            ws: null, //建立的连接
+            lockReconnect: false, //是否真正建立连接
+            timeout: 5 * 1000, //5秒一次心跳
+            timeoutObj: null, //心跳心跳倒计时
+            serverTimeoutObj: null, //心跳倒计时
+            timeoutnum: null, //断开 重连倒计时
+            reconnect_num: 0, // 重连次数
+            isDestroyed: false, // 关闭或切换页面，是否断开
+
+            dialogPresetVisible: false,
+            istruefalse: true,
+            checkList: [],
+            ptzconfig: {
+                id: 0,
+                ip: "10.10.10.219",
+                url: "0.0.0.0:0",
+                username: "admin",
+                password: "AGvay+123456",
+                add_name: "ptz1",
+                add_addr: "",
+            },
+            autotrackid: "",
+            choosetrackoptions: [{
+                value: '1',
+                label: 'ID最小'
+            }, {
+                value: '2',
+                label: 'ID最大'
+            }, {
+                value: '3',
+                label: '锁定ID'
+            }, {
+                value: '4',
+                label: '最大目标'
+            }, {
+                value: '5',
+                label: '最小目标'
+            }],
+            choosetrackmodule: '',
+            AIalgorithm: [
+                {
+                    value: 'A01',
+                    label: "打电话",
+                }, {
+                    value: 'A02',
+                    label: "抽烟",
+                }, {
+                    value: 'A03',
+                    label: "明火",
+                }, {
+                    value: 'A04',
+                    label: "打电话",
+                }, {
+                    value: 'A05',
+                    label: "烟雾",
+                }, {
+                    value: 'A06',
+                    label: "灭火器",
+                }, {
+                    value: 'A07',
+                    label: "入侵检测"
+                }],
+            area: {
+                token: "1",
+                presetalgorithm: { "22": [0.1, 0.1, 0.1, 0.1], "23": [0.2, 0.2, 0.2, 0.2] },
+            },
+            autotrackkey: ["star", "end"],
+            buttons: [
+                { iclass: "el-icon-top-left", title: "top-left" },
+                { iclass: "el-icon-top", title: "top" },
+                { iclass: "el-icon-top-right", title: "top-right" },
+            ],
+            isBigImg: false,
+            preset_token: "",
+            preset_name: "",
+            preset_ai: [],
+            presetinfotableData: [],
+            presetinfotableData2: [],
+            tableData: [
+                { token: "1", name: "东南角预设点", algorithm: ["无"], show: false },
+                { token: "2", name: "西南角预设点", algorithm: ["无"], show: false },
+                { token: "3", name: "东南角预设点", algorithm: ["无"], show: false },
+                { token: "4", name: "西南角预设点", algorithm: ["无"], show: false },
+            ],
+        };
+    },
+    methods: {
+        tableRowStyle({ row, rowIndex }) {
+            return "padding: 0px;font-size:0.8vw;text-align: center;background-color: #15718E;border-bottom: 1px solid #3DBAF1;color: #fff;";
+        },
+        tableHeaderColor({ row, column, rowIndex, columnIndex }) {
+            return "text-align: center;background-color: #041E2B;border-bottom: 1px solid #3DBAF1;color: #fff;";
+        },
+        play_stream(stream_url, videoElement) {
+            if (flv.isSupported()) {
+                var flvPlayer = flv.createPlayer({
+                    type: "flv",
+                    url: stream_url,
+                });
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.load(); //加载
+                videoElement.play();
+            }
+        },
+        addPreset() {
+            ptzpresetControl({
+                ptzpreset: "setpreset",
+                ptzpresetname: this.preset_name,
+                ptzpresettoken: this.preset_token,
+            }).then((res) => {
+                if (res.code == 2200) {
+                    let presetinfoDate = {
+                        token: this.preset_token,
+                        name: this.preset_name,
+                        ai: this.preset_ai,
+                    };
+                    this.presetinfotableData.push(presetinfoDate);
+                    this.$message.success("发送成功");
+                } else {
+                    this.$message.warning(res.msg);
+                }
+            });
+            // let preset_save_key = false;
+            // for (let i = 0; i <= this.presetinfotableData2.length; i++) {
+            //   if (this.preset_token === this.presetinfotableData2[i].token) {
+            //     preset_save_key = true;
+            //     break;          
+            //   }
+            // };
+            // if (preset_save_key) {
+            //   ptzpresetControl({
+            //     ptzpreset: "setpreset",
+            //     ptzpresetname: this.preset_name,
+            //     ptzpresettoken: this.preset_token,
+            //   }).then((res) => {
+            //     if (res.code == 2200) {
+            //       let presetinfoDate = {
+            //         token: this.preset_token,
+            //         name: this.preset_name,
+            //         ai: this.preset_ai,
+            //         };
+            //       this.presetinfotableData.push(presetinfoDate);
+            //       this.$message.success("发送成功");
+            //     } else {
+            //       this.$message.warning(res.msg);
+            //     }
+            //   });      
+            // } else {
+            //   ptzpresetControl({
+            //     ptzpreset: "setpreset",
+            //     ptzpresetname: this.preset_name,
+            //     ptzpresettoken: this.preset_token,
+            //   }).then((res) => {
+            //     if (res.code == 2200) {
+            //       let presetinfoDate = {
+            //         token: this.preset_token,
+            //         name: this.preset_name,
+            //         ai: this.preset_ai,
+            //         };
+            //       this.presetinfotableData.push(presetinfoDate);
+            //       this.$message.success("发送成功");
+            //     } else {
+            //       this.$message.warning(res.msg);
+            //     }
+            //   });
+            // };
+        },
+        GetUrlPTZ() {
+            ptzipControl({
+                ptzip: this.ptzconfig.ip,
+            }).then((res) => {
+                if (res.code === 2200) {
+                    (this.ptzconfig.url = res.data),
+                        console.log(res.data),
+                        console.log("获取url成功"),
+                        ptzinitControl({
+                            ptzurl: this.ptzconfig.url,
+                            ptzusername: this.ptzconfig.username,
+                            ptzpassword: this.ptzconfig.password,
+                        }).then((res) => {
+                            if (res.code === 2200) {
+                                (this.ptzconfig.add_addr = res.data),
+                                    console.log("初始化成功"),
+                                    console.log("获取流成功");
+                                // console.log(`rtsp://${this.ptzconfig.username}:${this.ptzconfig.password}@${this.ptzconfig.ip}`);
+                                ptzadd({
+                                    name: this.ptzconfig.add_name,
+                                    addr: this.ptzconfig.add_addr,
+                                }).then((res) => {
+                                    if (res.code === 2200) {
+                                        this.ptzconfig.id = res.data.id;
+                                        console.log(res.data.id);
+                                        console.log("摄像头添加成功");
+                                    } else {
+                                        this.$message.warning(res.msg);
+                                    }
+                                });
+                            } else {
+                                this.$message.warning(res.msg);
+                            }
+                        });
+                } else {
+                    this.$message.warning(res.msg);
+                }
+            });
+        },
+
+        // InitAndGetRtspPTZ() {
+        //   ptzinitControl({
+        //     ptzurl: this.ptzconfig.url,
+        //     ptzusername: this.ptzconfig.username,
+        //     ptzpassword: this.ptzconfig.password,
+        //   }).then(res => {
+        //     if (res.code === 2200) {
+        //       this.ptzconfig.add_addr = res.data,
+        //       console.log("初始化成功"),
+        //       console.log("获取流成功");
+        //     } else {
+        //       this.$message.warning(res.msg);
+        //     }
+        //   });
+        // },
+
+        // AddCamera() {
+        //   let param = {name: this.add_name, addr: this.add_addr};
+        //   let _this = this;
+        //   ajax.get("/api/v1/camera/add", {params: param}).then(function (res) {
+        //       let data = res.data;
+        //       if (data.code === 2200) {
+        //           console.log(data);
+        //           _this.Ready();
+        //       } else {
+        //           console.log(res);
+        //       }
+        //   });
+        //   console.log(this.add_addr);
+        // },
+
+        ListCamera() {
+            getlist({}).then((res) => {
+                if (res.code === 2200) {
+                    (this.ptzconfig.id = res.data.list[0].id),
+                        (this.ptzconfig.ip = res.data.list[0].ip),
+                        (this.ptzconfig.add_name = res.data.list[0].name),
+                        (this.ptzconfig.add_addr = res.data.list[0].main_stream),
+                        console.log(res.data.list[0]);
+                    // $(".config-div").css("display", "none");
+                    // _this.Ready();
+                } else {
+                    console.log("失败", res);
+                }
+            });
+        },
+
+        downsendPreset() {
+            ptzdownControl({ ptz_area_msg: JSON.stringify(this.area) }).then(res => {
+                let data = res.data;
+                if (data.code == 2200) {
+                    console.log("成功");
+                } else {
+                    console.log("失败");
+                }
+            });
+            // ajax.get("/api/v1/camera/ai", { params: param }).then(function (res) {
+            //   let data = res.data;
+            //   if (data.code === 2200) {
+            //     // console.log(data);
+            //     $(".config-div").css("display", "none");
+            //     _this.Ready();
+            //   } else {
+            //     console.log("配置失败", res);
+            //     alert("配置失败");
+            //   }
+            // });
+        },
+        downsendInfo() {
+            if (this.istruefalse) {
+                ptzdownControl({ ptz_send_msg: "star" }).then(res => {
+                    this.istruefalse = false;
+                    let data = res.data;
+                    if (data.code == 2200) {
+                        console.log("成功");
+                    } else {
+                        console.log("失败");
+                    }
+                })
+            } else {
+                ptzdownControl({ ptz_send_msg: "end" }).then(res => {
+                    this.istruefalse = true;
+                    let data = res.data;
+                    if (data.code == 2200) {
+                        console.log("成功");
+                    } else {
+                        console.log("失败");
+                    }
+                })
+            }
+        },
+        downSendTrackIdInfo() {
+            ptzdownControl({ ptz_track_id_msg: this.autotrackid, ptz_track_mode_msg: this.choosetrackmodule }).then(res => {
+                let data = res.data;
+                if (data.code == 2200) {
+                    console.log("成功");
+                } else {
+                    console.log("失败");
+                }
+            })
+        },
+        savePreset(row) {
+            ptzpresetControl({
+                ptzpreset: "setpreset",
+                ptzpresetname: row.name,
+                ptzpresettoken: row.token,
+            }).then((res) => {
+                if (res.code == 2200) {
+                    row.show = false;
+                    this.$message.success("发送成功");
+                } else {
+                    this.$message.warning(res.msg);
+                }
+            });
+        },
+        deletePreset(row) {
+            ptzpresetControl({
+                ptzpreset: "deletepreset",
+                ptzpresettoken: row.token,
+            }).then((res) => {
+                if (res.code == 2200) {
+                    this.$message.success("发送成功");
+                } else {
+                    this.$message.warning(res.msg);
+                }
+            });
+        },
+        gotoPreset(row) {
+            ptzpresetControl({
+                ptzpreset: "gotopreset",
+                ptzpresettoken: row.token,
+            }).then((res) => {
+                if (res.code == 2200) {
+                    this.$message.success("发送成功");
+                } else {
+                    this.$message.warning(res.msg);
+                }
+            });
+        },
+        editPreset(row) {
+            row.show = true;
+        },
+        printPreset() {
+            ptzpresetControl({ ptzpreset: "getpreset" }).then((res) => {
+                if (res.code == 2200) {
+                    this.presetinfotableData2.length = 0;
+                    for (let i = 0; i <= res.data.length; i++) {
+                        let presetDate = {
+                            token: res.data[i]["-token"],
+                            name: res.data[i].Name,
+                            ai: "无",
+                        };
+                        this.presetinfotableData2.push(presetDate);
+                    }
+                } else {
+                    this.$message.warning(res.msg);
+                }
+            });
+            if (this.presetinfotableData.length === 0) {
+                this.$message.warning("11111111111111");
+                console.log(7777)
+                console.log(this.presetinfotableData2)
+                this.presetinfotableData = this.presetinfotableData2;
+                console.log(this.presetinfotableData)
+            }
+        },
+        ControlStop() {
+            ptzsendControl({ ptz: "s" }).then((res) => {
+                if (res.code == 2200) {
+                    this.$message.success("发送成功");
+                } else {
+                    this.$message.warning(res.msg);
+                }
+            });
+        },
+
+        ControlPTZ(key) {
+            switch (key) {
+                case "a":
+                    ptzsendControl({ ptz: "a" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "d":
+                    ptzsendControl({ ptz: "d" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "q":
+                    ptzsendControl({ ptz: "q" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "w":
+                    ptzsendControl({ ptz: "w" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "e":
+                    ptzsendControl({ ptz: "e" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "z":
+                    ptzsendControl({ ptz: "z" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "x":
+                    ptzsendControl({ ptz: "x" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "c":
+                    ptzsendControl({ ptz: "c" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "1":
+                    ptzsendControl({ ptz: "1" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+                case "2":
+                    ptzsendControl({ ptz: "2" }).then((res) => {
+                        if (res.code == 2200) {
+                            this.$message.success("发送成功");
+                        } else {
+                            this.$message.warning(res.msg);
+                        }
+                    });
+                    break;
+            }
+        },
+
+        notify: function (title, msg, err_type) {
+            Notification({ title: title, message: msg, type: err_type });
+        },
+        initWebSocket() {
+            try {
+                if ("WebSocket" in window) {
+                    //建立连接
+                    //初始化weosocket
+                    let wsuri = "ws://" + window.location.host + "/api/v1/event/ws";
+                    // let wsuri = "ws://10.10.10.119:10225/api/v1/event/ws";
+                    //建立连接
+                    this.ws = new WebSocket(wsuri);
+                }
+                this.monitorWebsocket();
+            } catch (e) {
+                this.wsReconnect();
+            }
+        },
+        wsReconnect() {
+            //websocket重新连接
+            var that = this;
+            if (that.lockReconnect || that.isDestroyed) {
+                return;
+            }
+            that.lockReconnect = true;
+            //没连接上会一直重连，设置延迟避免请求过多
+            that.timeoutnum && clearTimeout(that.timeoutnum);
+            that.timeoutnum = setTimeout(function () {
+                //新连接
+                that.initWebSocket();
+                that.lockReconnect = false;
+            }, 5000);
+        },
+        heartBeatReset() {
+            //重置心跳
+            var that = this;
+            //清除时间
+            clearTimeout(that.timeoutObj);
+            clearTimeout(that.serverTimeoutObj);
+            //重启心跳
+            that.heartBeatStart();
+        },
+        heartBeatStart() {
+            //开启心跳
+            var self = this;
+            self.timeoutObj && clearTimeout(self.timeoutObj);
+            self.serverTimeoutObj && clearTimeout(self.serverTimeoutObj);
+            self.timeoutObj = setTimeout(function () {
+                //这里发送一个心跳，后端收到后，返回一个心跳消息
+                if (self.ws.readyState == 1) {
+                    //如果连接正常
+                    self.ws.send("ping");
+                } else {
+                    //否则重连
+                    console.log("readyState is ", self.ws.readyState);
+                    self.wsReconnect();
+                }
+                self.serverTimeoutObj = setTimeout(function () {
+                    //超时关闭
+                    console.log("超时关闭!");
+                    self.ws.close();
+                }, 10000);
+            }, 5000);
+        },
+        monitorWebsocket() {
+            var _this = this;
+            this.ws.onopen = function (event) {
+                console.log("连接" + event);
+                _this.heartBeatStart(); // 开启心跳
+            };
+            this.ws.onmessage = function (event) {
+                if (event.data === "pong") {
+                    console.log(event.data);
+                    //收到服务器信息，心跳重置
+                    _this.heartBeatReset();
+                    return;
+                }
+                let data = JSON.parse(event.data);
+                if (data == "") {
+                    return;
+                }
+                _this.heartBeatReset();
+                if (data["is_warning"]) {
+                    if (_this.WarningImgIndex[2]) {
+                        _this.WarningImgInfo.warningimgpath4 = _this.WarningImgInfo.warningimgpath3;
+                    }
+                    if (_this.WarningImgIndex[1]) {
+                        _this.WarningImgInfo.warningimgpath3 = _this.WarningImgInfo.warningimgpath2;
+                        _this.WarningImgIndex[2] = true;
+                    }
+                    if (_this.WarningImgIndex[0]) {
+                        _this.WarningImgInfo.warningimgpath2 = _this.WarningImgInfo.warningimgpath1;
+                        _this.WarningImgIndex[1] = true;
+                    }
+                    _this.WarningImgInfo.warningimgpath1 = "/" + data["image_path"];
+                    _this.WarningImgIndex[0] = true;
+                } else {
+                    _this.ImgInfo.imgPath = "/" + data["image_path"];
+                }
+
+                console.log(data["img_coordinate"]);
+            };
+            this.ws.onerror = function (event) {
+                // alert(event.data);
+                console.log("错误：" + event);
+                _this.wsReconnect();
+                // print("错误："+event.data)
+            };
+            this.ws.onclose = function (event) {
+                //连接关闭事件
+                //提示关闭
+                console.log("isDestroyed: ", _this.isDestroyed);
+                if (!_this.isDestroyed) {
+                    console.log(
+                        "连接已关闭:",
+                        event.code + " " + event.reason + " " + event.wasClean
+                    );
+                    _this.reconnect_num += 1;
+                    var err_str =
+                        "网络服务差, 正在执行第" +
+                        _this.reconnect_num.toString() +
+                        "次重连！";
+                    _this.notify("错误", err_str, "error");
+                }
+                //重连
+                _this.wsReconnect();
+            };
+        },
+
+        LoopTS(obj, key) {
+            let _this = this;
+            for (let j = 0; j < 3; j++) {
+                for (let i = 1; i <= 10; i++) {
+                    setTimeout(function () {
+                        // $(obj).css({"box-shadow": _this.ColorList.get(key)+" 0px 0px "+i+"px "+i+"px inset"})
+                        $(obj).css({
+                            "box-shadow": "red 0px 0px " + i + "px " + i + "px inset",
+                        });
+                    }, i * 15);
+                }
+                let num = 1;
+                for (let i = 9; i >= 0; i--) {
+                    setTimeout(function () {
+                        // $(obj).css({"box-shadow": _this.ColorList.get(key)+" 0px 0px "+i+"px "+i+"px inset"})
+                        $(obj).css({
+                            "box-shadow": "red 0px 0px " + i + "px " + i + "px inset",
+                        });
+                    }, num * 15 + 150);
+                    num += 1;
+                }
+            }
+        },
+    },
+    mounted() {
+        let player_1 = document.getElementById("video_1");
+        let stream_1 = "http://10.10.10.241/flv?port=1985&app=myapp&stream=testv";
+        this.play_stream(stream_1, player_1);
+        this.monitorWebsocket(); // websocket 监听事件
+    },
+
+    created() {
+        // //页面刚进入时开启长连接
+        this.initWebSocket();
+    },
+    destroyed() {
+        console.log("切换页面关闭连接");
+        this.isDestroyed = true;
+        this.ws.close();
+        //页面销毁时关闭长连接
+        // this.wsReconnect();
+        // window.addEventListener('beforeunload', e => this.wsReconnect(e))
+    },
+    beforeDestroy() {
+        this.isDestroyed = true;
+        this.ws.close();
+        // window.addEventListener('beforeunload', e => this.wsReconnect())
+    },
+}
+</script>
+
+<style scoped>
+.content {
+    width: 100%;
+    height: 100%;
+    padding-left: 0.5%;
+    background-color: rgba(4, 30, 43, 0.8);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.left {
+    width: 70%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.left .left-top {
+    width: 99%;
+    height: 75%;
+    border: 1px solid #00b0f0;
+    border-radius: 5px;
+}
+
+.left .left-top .title {
+    width: 100%;
+    height: 5%;
+    text-align: center;
+    position: relative;
+}
+
+.left .left-top .title .curent-msg {
+    width: 45%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.left .left-top .title .curent-msg .msg-box {
+    height: 80%;
+    color: #fff;
+}
+
+.left .left-top .title h3 {
+    margin-top: 1%;
+}
+
+.left .left-top .bigimg {
+    width: 100%;
+    height: 85%;
+    /* background-image: url(../../static/images/camera_default.png);
+  background-size: 100%; */
+    /* border: 1px solid #00B0F0; */
+    position: relative;
+}
+
+.left .left-top .bigimg .switch {
+    position: absolute;
+    right: 2%;
+    top: -6%;
+}
+
+.left .left-top .bigimg .switch>>>.el-switch__label {
+    color: #fff;
+}
+
+.left .left-top .bigimg .allimg {
+    width: 30%;
+    height: 30%;
+    /* background-color: rgba(4, 30, 43, 0.8); */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.left .left-top .bigimg .allimg img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.left .left-top .bigimg .warn-msg {
+    width: 30%;
+    height: 30%;
+    background-color: rgba(4, 30, 43, 0.5);
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.left .left-top .bigimg .warn-msg .msg-text {
+    padding: 2%;
+}
+
+.left .left-top .bigimg img {
+    width: 100%;
+    height: 100%;
+}
+
+.left .left-top .left-mid {
+    width: 100%;
+    height: 8%;
+    /* background-color: #00b0f0; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left .left-top .left-mid .mid-box {
+    width: 96%;
+    height: 50%;
+}
+
+.left .left-top .left-mid .mid-box>>>.el-radio {
+    color: #fff;
+}
+
+.left .left-bottom {
+    width: 99%;
+    height: 23%;
+    border: 1px solid #00b0f0;
+    border-radius: 5px;
+}
+
+.left .left-bottom .title {
+    width: 100%;
+    height: 13%;
+    text-align: center;
+}
+
+.left .left-bottom .event-img-list {
+    width: 100%;
+    height: 87%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.left .left-bottom .event-img-list .img-box {
+    width: 24.5%;
+    height: 100%;
+    /* border: 1px solid #00b0f0; */
+}
+
+.left .left-bottom .event-img-list .img-box img {
+    width: 100%;
+    height: 100%;
+}
+
+.right {
+    width: 30%;
+    height: 100%;
+    border-radius: 5px;
+    background-color: #0b3d51;
+}
+
+.right .right-top {
+    width: 100%;
+    height: 50%;
+    border-radius: 5px;
+    /* background-color: #00b0f0; */
+}
+
+.right .right-top .center-box {
+    width: 96%;
+    height: 96%;
+    margin-left: 2%;
+    margin-top: 2%;
+    /* background-color: antiquewhite; */
+}
+
+.right .right-top .center-box .channel-select>>>.el-descriptions-item__label:not(.is-bordered-label) {
+    line-height: 200%;
+}
+
+.right .right-top .center-box .default-list {
+    width: 100%;
+    height: 90%;
+    /* background-color: #00b0f0; */
+}
+
+.right .right-top .center-box .default-list .select-title {
+    width: 100%;
+    height: 8%;
+    padding-top: 2%;
+    background-color: #062534;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.right .right-top .center-box .default-list .select-title .arrow {
+    width: 20%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+    color: #fff;
+}
+
+.right .right-top .center-box .default-list .select-title .arrow:hover {
+    color: #00b0f0;
+}
+
+.right .right-top .center-box .default-list .select-title .arrow i {
+    position: absolute;
+    left: 40%;
+    top: 10%;
+}
+
+.right .right-top .center-box .default-list .select-title h3 {
+    width: 60%;
+    text-align: center;
+}
+
+.right .right-top .center-box .default-list .selected-list {
+    width: 100%;
+    height: 100%;
+    background-color: #15718e;
+    overflow-y: scroll;
+    position: relative;
+}
+
+.right .right-top .center-box .default-list .selected-list .table-add {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 10%;
+    background-color: #135b7e;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right .right-bottom {
+    width: 96%;
+    height: 50.5%;
+    margin-left: 1.5%;
+    margin-top: 0%;
+    /* background-color: #00b0f0; */
+}
+
+.right .right-bottom .ctrl-botton {
+    width: 100%;
+    height: 15%;
+    background-color: #041e2b;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.right .right-bottom .ctrl-botton .button {
+    width: 30%;
+    height: 80%;
+    color: #fff;
+    background-color: #0b3d51;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    cursor: pointer;
+}
+
+.right .right-bottom .ctrl-botton .button:hover {
+    color: #00b0f0;
+    background-color: #15718e;
+}
+
+.right .right-bottom .PTZ-botton {
+    width: 100%;
+    height: 80%;
+    background-color: #041e2b;
+}
+
+.right .right-bottom .PTZ-botton .bottons-box {
+    width: 100%;
+    height: 100%;
+    /* background-color: #00b0f0; */
+}
+
+.right .right-bottom .ctrl-botton .bottons-suodinginput {
+    width: 30%;
+    height: 100%;
+    float: left;
+    padding-top: 5%;
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .title {
+    color: #fff;
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .bottons {
+    width: 100%;
+    height: 100%;
+    padding-top: 0%;
+    /* background-color: #00b0f0; */
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .bottons .row {
+    width: 96%;
+    height: 100%;
+    margin-top: 3.5%;
+    margin-left: 1%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .bottons .row .item {
+    width: 30%;
+    height: 37px;
+    background-color: #15718e;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    cursor: pointer;
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .bottons .row .item img {
+    width: 60%;
+    height: 60%;
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .bottons .row .item i {
+    color: #041e2b;
+    font-size: 2.5vw;
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .bottons .row .items {
+    width: 12%;
+    height: 99%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    /* cursor: pointer; */
+    /* background-color: #15718E; */
+}
+
+.right .right-bottom .PTZ-botton .bottons-box .bottons .row .items {
+    font-size: 0.5vw;
+}
+
+.save-info {
+    width: 13%;
+    margin-left: 15%;
+    float: left;
+    border-radius: 5px;
+    border: 1px solid #8adeff;
+    background: none;
+    color: #8adeff;
+    cursor: pointer;
+}
+
+.el-input-padding>>>.el-input__inner {
+    padding: 0 0;
+}
+
+.bottons-right-one {
+    width: 93%;
+    padding-left: 3%;
+    padding-top: 4%;
+    float: left;
+}
+
+.right .right-bottom .bottons-right-two {
+    width: 93%;
+    float: left;
+    padding-top: 5%;
+    background-color: #041e2b;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.right .right-bottom .bottons-right-two .button-two {
+    width: 80%;
+    height: 70%;
+    color: #fff;
+    background-color: #0b3d51;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    cursor: pointer;
+}
+
+.bottons-left {
+    width: 45%;
+    float: left;
+}
+
+.bottons-right {
+    width: 54%;
+    float: left;
+}
+
+.left .left-top .bigimg .img-div {
+    width: 100%;
+    height: 100%;
+}
+
+.add_preset_style {
+    width: 50%;
+    padding-left: 20%;
+    padding-top: 1%;
+}
+</style>
