@@ -165,8 +165,8 @@
                 FillMap:new Map(),
 
                 CoordinateArr: [],
-              inputInfo_name: "名称:",
-              inputInfo_pw: "地址:",
+              inputInfo_name: "名称：",
+              inputInfo_pw: "地址：",
               is_onvif: false,
                 is_new_area: false,
               onvif_add:{},
@@ -845,11 +845,13 @@
 
     .right-input-div {
         width: 100%;
-        height: 50%;
+        /* height: 50%; */
+        /* background-color: #00d8ff; */
         /*background: #4d7c8e;*/
     }
 
     .r-label {
+        /* height: 15%; */
         left: 5%;
         font-size: 1vw;
         color: #8adeff;
@@ -877,8 +879,8 @@
     .right-button {
         width: 25%;
         height: 44%;
-        top: 10%;
-        left: 17%;
+        /* top: 10%; */
+        /* left: 17%; */
         outline: none;
         background: none;
         border: 1px solid #5bc0de;

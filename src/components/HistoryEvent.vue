@@ -4,48 +4,33 @@
       <div class="select-div">
         <span>事件：</span>
         <div class="n_input">
-          <el-select v-model="event_val" class="m-2" placeholder="Select" size="large">
-            <el-option
-              v-for="item in event_opt"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
+          <el-select v-model="event_val" class="m-2" placeholder="Select" size="small">
+            <el-option v-for="item in event_opt" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
-        <button class="search" @click="SearchClick">搜索</button>
-        <!--      <a class="download" :download="download_excel" style="display:none;"></a>-->
-        <!--      <a class="download" :download="download_excel">下载</a>-->
-        <button class="search" @click="ExportTable">生成报表</button>
+
       </div>
       <div class="select-div">
         <span>通道：</span>
         <div class="n_input">
-          <el-select v-model="camera_val" class="m-2" placeholder="Select" size="large">
-            <el-option
-              v-for="item in camera_opt"
-              :key="item.ID"
-              :label="item.NoteName"
-              :value="item.ThreadID"
-            />
+          <el-select v-model="camera_val" class="m-2" placeholder="Select" size="small">
+            <el-option v-for="item in camera_opt" :key="item.ID" :label="item.NoteName" :value="item.ThreadID" />
           </el-select>
         </div>
       </div>
       <div class="select-div">
-        <span class="demonstration">日期时间</span>
+        <span class="demonstration">日期时间：</span>
         <div class="n_input">
-          <el-date-picker
-            v-model="datetime"
-            type="datetimerange"
-            :picker-options="pickerOptions"
-            value-format="yyyy-MM-dd hh:mm:ss"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          >
+          <el-date-picker v-model="datetime" type="datetimerange" :picker-options="pickerOptions"
+            value-format="yyyy-MM-dd hh:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+            size="small">
           </el-date-picker>
         </div>
       </div>
+      <el-button class="search" @click="SearchClick" size="mini">搜索</el-button>
+      <!--      <a class="download" :download="download_excel" style="display:none;"></a>-->
+      <!--      <a class="download" :download="download_excel">下载</a>-->
+      <el-button class="search" @click="ExportTable" size="small">生成报表</el-button>
     </div>
     <div class="table-div">
       <table class="table">
@@ -258,7 +243,7 @@ export default {
     this.SearchClick()
   },
   methods: {
-    wsMsgHandler: function(e) {
+    wsMsgHandler: function (e) {
       // if (!e.data) {
       //   return
       // }
@@ -276,7 +261,7 @@ export default {
       }
     },
     // 提示弹窗
-    notify: function(title, msg, err_type) {
+    notify: function (title, msg, err_type) {
       Notification({ title: title, message: msg, type: err_type })
     },
     /**
@@ -354,7 +339,7 @@ export default {
         end_time: this.end_time,
       }
       this.download_is_click = 1
-      ajax.get('/api/v1/event/export', { params: param }).then(function(res) {
+      ajax.get('/api/v1/event/export', { params: param }).then(function (res) {
         let data = res.data
         if (data.code === 2200) {
           console.log(data)
@@ -445,50 +430,55 @@ export default {
   -ms-user-select: none;
   user-select: none;
 }
+
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
   position: absolute;
 }
+
 ::-webkit-scrollbar-thumb {
   background-color: #5bc0de;
 }
+
 ::-webkit-scrollbar-track {
   background-color: #053039;
 }
 
 .param-div {
-  width: 100%;
-  height: 13%;
+  width: 97%;
+  /* height: 13%; */
+  margin: 2% 0;
+  display: flex;
+  align-content: space-around;
   /*background: #8adeff;*/
 }
+
 .select-div {
-  width: 26%;
   height: 100%;
-  display: table;
-  /* background: red; */
-  float: left;
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  margin-left: 2%;
 }
-.select-div span {
-  /*width:13%;*/
-  display: table-cell;
-  vertical-align: middle;
-  float: left;
-  left: 3%;
-  position: relative;
-  top: 18%;
-}
-.select-div .n_input {
+
+/* .select-div .n_input {
   width: 60%;
   float: left;
   left: 5%;
   top: 9%;
+} */
+.el-button+.el-button{
+  margin-left: 1%;
+  height: 30%;
 }
 .search {
-  width: 30%;
-  height: 40%;
-  top: 15%;
-  left: 3%;
+  /* width: 30%; */
+  /* height: 30%; */
+  /* top: 15%;
+  left: 3%; */
+  margin-left: 2%;
+
 }
 .table-div {
   width: 96%;
@@ -498,24 +488,30 @@ export default {
   border-collapse: collapse;
   overflow-y: scroll;
 }
+
 .table {
   width: 100%;
 }
+
 #thead_1 tr {
   border-bottom: 1px solid rgba(32, 165, 206, 0.6);
   color: rgb(32, 165, 206);
   height: 40px;
   background: #0a640a;
 }
+
 #tbody_1 tr {
   height: 100px;
 }
+
 #tbody_1 tr:hover {
   background: rgba(26, 83, 114, 0.6);
 }
+
 td {
   text-align: center;
 }
+
 .page-div {
   width: 100%;
   height: 12%;

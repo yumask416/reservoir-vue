@@ -5,7 +5,7 @@
                 <div class="title">
                     <div class="curent-msg">
                         <div class="msg-box" style="width: 40%">
-                            <span>当前巡航线：</span><span>{{CruiseLine}}</span>
+                            <span>当前巡航线：</span><span>{{ CruiseLine }}</span>
                         </div>
                         <div class="msg-box" style="width: 60%">
                             <span>当前预置点：</span><span>东南角预置点</span>
@@ -74,111 +74,15 @@
         </div>
         <div class="right">
             <div class="right-top">
-                <div class="center-box">
-                    <div class="default-list">
-                        <div class="select-title">
-                            <div class="arrow"><i class="el-icon-caret-left"></i></div>
-                            <h3>{{CruiseLine}}</h3>
-                            <div class="arrow"><i class="el-icon-caret-right"></i></div>
-                        </div>
-                        <div class="selected-list">
-                            <div class="table">
-                                <el-table :data="presetinfotableData" tooltip-effect="dark" :cell-style="tableRowStyle"
-                                    :header-cell-style="tableHeaderColor" style="width: 100%">
-                                    <el-table-column prop="token" label="ID" width="50" show-overflow-tooltip>
-                                        <template slot-scope="scope">
-                                            <el-input size="small" v-model="scope.row.token" v-show="scope.row.show"
-                                                placeholder="请输入内容" class="el-input-padding"></el-input>
-                                            <span v-show="!scope.row.show">{{ scope.row.token }}</span>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="name" label="预设点名称" width="90" show-overflow-tooltip>
-                                        <template slot-scope="scope">
-                                            <el-input size="small" v-model="scope.row.name" v-show="scope.row.show"
-                                                placeholder="请输入内容" class="el-input-padding"></el-input>
-                                            <span v-show="!scope.row.show">{{ scope.row.name }}</span>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="ai" label="算法"  show-overflow-tooltip>
-                                    </el-table-column>
-                                    <el-table-column label="操作">
-                                        <template slot-scope="scope">
-                                            <el-tooltip class="item" effect="dark" content="调用" placement="top">
-                                                <i class="el-icon-position" style="cursor: pointer"
-                                                    @click="gotoPreset(scope.row)"></i>
-                                            </el-tooltip>
-                                            <el-tooltip class="item" effect="dark" content="保存" placement="top">
-                                                <i class="el-icon-document-copy" style="cursor: pointer"
-                                                    @click="savePreset(scope.row), printPreset(), downsendPreset(scope.row)"></i>
-                                            </el-tooltip>
-                                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                                                <i class="el-icon-delete-solid" style="cursor: pointer"
-                                                    @click="deletePreset(scope.row), printPreset()"></i>
-                                            </el-tooltip>
-                                            <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-                                                <i class="el-icon-s-claim" style="cursor: pointer"
-                                                    @click="editPreset(scope.row)"></i>
-                                            </el-tooltip>
-                                        </template>
-                                    </el-table-column>
-                                </el-table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="right-bottom">
                 <!-- <div class="table-add" @click="savePreset(),printPreset()">
-                    <i class="el-icon-plus">
-                    </i> 添加
+                    <i class="el-icon-plus"></i> 添加
                 </div> -->
-                <div class="ctrl-botton">
-                    <div class="button" @click="printPreset(), dialogPresetVisible = true"><span>增加预置点</span></div>
-                    <el-dialog title="增加预置点" :visible.sync="dialogPresetVisible" width="80%">
-                        <div class="add_preset_style">
-                            <el-input v-model="preset_token" placeholder="预置点ID"></el-input>
-                        </div>
-                        <div class="add_preset_style">
-                            <el-input v-model="preset_name" placeholder="预置点名称"></el-input>
-                        </div>
-                        <div class="add_preset_style">
-                            <el-select v-model="preset_ai" multiple placeholder="预置点算法">
-                                <el-option v-for="item in AIalgorithm" :key="item.value" :label="item.label"
-                                    :value="item.label"></el-option>
-                            </el-select>
-                        </div>
-                        <span slot="footer" class="dialog-footer">
-                            <el-button @click="dialogPresetVisible = false">取 消</el-button>
-                            <el-button type="primary" @click="addPreset(), dialogPresetVisible = false">确 定</el-button>
-                        </span>
-                    </el-dialog>
-                    <div class="button" @click="printPreset()"><span>显示预置点</span></div>
-                    <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
-                </div>
-                <div class="ctrl-botton">
-
-                    <div class="button" @click="addCruiseLine()"><span>添加巡航线</span></div>
-                    <div class="button" @click="downSendTrackIdpara()"><span>更改跟踪参数</span></div>
-                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
-
-                </div>
-                <div class="ctrl-bottons">
-                    <div class="bottons-suodinginput">
-                        <el-select size="small" v-model="choosetrackmodule" placeholder="选择跟踪方式" clearable>
-                            <el-option v-for="item in choosetrackoptions" :key="item.value" :label="item.label"
-                                :value="item.value"></el-option>
-                        </el-select>
-                    </div>
-                    <div class="bottons-suodinginput">
-                        <el-input size="small" v-model="autotrackid" placeholder="请输入跟踪ID" clearable></el-input>
-                    </div>
-                </div>
-                <div class="PTZ-botton">
+                <div class="PTZ-botton clearfix">
                     <div class="bottons-box">
                         <!-- <div class="title">
-              <el-divider direction="vertical"></el-divider>
-              <span>云台</span>
-            </div> -->
+                            <el-divider direction="vertical"></el-divider>
+                            <span>云台</span>
+                        </div> -->
                         <div class="bottons">
                             <div class="bottons-left">
                                 <div class="row">
@@ -236,16 +140,133 @@
                                 <div class="bottons-right-one">
                                     <el-input size="small" v-model="ptzconfig.password" placeholder="IPC密码"></el-input>
                                 </div>
-                                <div class="bottons-right-two">
-                                    <div class="button-two" @click="GetUrlPTZ()">
-                                        <span>添加球机</span>
-                                    </div>
+                                <div class="bottons-right-one">
+                                    <el-select size="small" v-model="choosetrackmodule" placeholder="选择跟踪方式" clearable>
+                                        <el-option v-for="item in choosetrackoptions" :key="item.value"
+                                            :label="item.label" :value="item.value"></el-option>
+                                    </el-select>
                                 </div>
-                                <div class="bottons-right-two">
-                                    <div class="button-two" @click="ListCamera()">
-                                        <span>删除球机</span>
-                                    </div>
+                                <div class="bottons-right-one">
+                                    <el-input size="small" v-model="autotrackid" placeholder="请输入跟踪ID" clearable>
+                                    </el-input>
                                 </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ctrl-bottons">
+                    <div class="bottons-right-two" @click="GetUrlPTZ()">
+                        <span>添加球机</span>
+                    </div>
+                    <div class="bottons-right-two" @click="ListCamera()">
+                        <span>删除球机</span>
+                    </div>
+                </div>
+                <div class="ctrl-botton">
+                    <!-- 增加预置点 -->
+                    <div class="button" @click="printPreset(), dialogPresetVisible = true"><span>增加预置点</span></div>
+                    <template>
+                        <el-dialog class="dialogPreset" title="增加预置点" :visible.sync="dialogPresetVisible" width="40%">
+                            <div class="add_preset_style">
+                                <span>预置点ID:</span>
+                                <el-input v-model="preset_token" placeholder="预置点ID" size="small"></el-input>
+                            </div>
+                            <div class="add_preset_style">
+                                <span>预置点名称:</span>
+                                <el-input v-model="preset_name" placeholder="预置点名称" size="small"></el-input>
+                            </div>
+                            <div class="add_preset_style">
+                                <span>预置点算法:</span>
+                                <el-select v-model="preset_ai" multiple placeholder="预置点算法" size="small">
+                                    <el-option v-for="item in AIalgorithm" :key="item.value" :label="item.label"
+                                        :value="item.label"></el-option>
+                                </el-select>
+                            </div>
+                            <span slot="footer" class="dialog-footer">
+                                <el-button @click="dialogPresetVisible = false" size="small">取 消</el-button>
+                                <el-button type="primary" @click="addPreset(), dialogPresetVisible = false"
+                                    size="small">确 定
+                                </el-button>
+                            </span>
+                        </el-dialog>
+                    </template>
+                    <div class="button" @click="printPreset()"><span>显示预置点</span></div>
+                    <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
+                    <!-- 添加巡航线 -->
+                    <div class="button" @click="addCruiseLine(), cruiseLineVisible = true"><span>添加巡航线</span></div>
+                    <template>
+                        <el-dialog :visible.sync="cruiseLineVisible" title="添加巡航线" width="50%">
+                            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
+                                @change="handleCheckAllChange">全选</el-checkbox>
+                            <div style="margin: 15px 0;"></div>
+                            <el-checkbox-group v-model="checkedLines" @change="handleCheckedCitiesChange">
+                                <el-checkbox v-for="city in cities" :label="city" :key="city">{{ city }}</el-checkbox>
+                            </el-checkbox-group>
+                        </el-dialog>
+                    </template>
+                    <!-- 更改跟踪参数 -->
+                    <div class="button" @click="downSendTrackIdpara(), trackIdparaVisible = true"><span>更改跟踪参数</span>
+                    </div>
+                    <template>
+                        <el-dialog :visible.sync="trackIdparaVisible" title="更改跟踪参数" width="50%">
+
+                        </el-dialog>
+                    </template>
+                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
+                </div>
+            </div>
+            <div class="right-bottom">
+                <div class="center-box">
+                    <div class="default-list">
+                        <div class="select-title">
+                            <div class="arrow"><i class="el-icon-caret-left"></i></div>
+                            <h3>{{ CruiseLine }}</h3>
+                            <div class="arrow"><i class="el-icon-caret-right"></i></div>
+                        </div>
+                        <div class="selected-list">
+                            <div class="table">
+                                <el-table :data="presetinfotableData" tooltip-effect="dark" :cell-style="tableRowStyle"
+                                    :header-cell-style="tableHeaderColor" style="width: 100%" max-height="250">
+                                    <el-table-column prop="token" label="ID" width="40" align="center"
+                                        show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            <el-input size="small" v-model="scope.row.token" v-show="scope.row.show"
+                                                placeholder="请输入内容" class="el-input-padding"></el-input>
+                                            <span v-show="!scope.row.show">{{ scope.row.token }}</span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="name" label="预设点名称" width="90" align="center"
+                                        show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            <el-input size="small" v-model="scope.row.name" v-show="scope.row.show"
+                                                placeholder="请输入内容" class="el-input-padding"></el-input>
+                                            <span v-show="!scope.row.show">{{ scope.row.name }}</span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="ai" label="算法" align="center" show-overflow-tooltip>
+                                    </el-table-column>
+                                    <el-table-column label="操作" align="center" width="100">
+                                        <template slot-scope="scope">
+                                            <el-tooltip class="item" effect="dark" content="调用" placement="top">
+                                                <i class="el-icon-position" style="cursor: pointer"
+                                                    @click="gotoPreset(scope.row)"></i>
+                                            </el-tooltip>
+                                            <el-tooltip class="item" effect="dark" content="保存" placement="top">
+                                                <i class="el-icon-document-copy" style="cursor: pointer"
+                                                    @click="savePreset(scope.row), printPreset(), downsendPreset(scope.row)"></i>
+                                            </el-tooltip>
+                                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                                <i class="el-icon-delete-solid" style="cursor: pointer"
+                                                    @click="deletePreset(scope.row), printPreset()"></i>
+                                            </el-tooltip>]
+                                            <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                                <i class="el-icon-s-claim" style="cursor: pointer"
+                                                    @click="editPreset(scope.row)"></i>
+                                            </el-tooltip>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
                             </div>
                         </div>
                     </div>
@@ -257,6 +278,7 @@
 <script >
 import $ from "jquery";
 import flv from "flv.js";
+import ajax from "axios";
 import {
     ptzsendControl,
     ptzinitControl,
@@ -266,6 +288,7 @@ import {
     getlist,
     ptzdownControl,
 } from "@/service/api/camera.js";
+const cityOptions = ['上海', '北京', '广州', '深圳'];
 export default {
     name: "PTZmanage",
     data() {
@@ -277,7 +300,7 @@ export default {
                 warningimgpath3: "../../static/images/camera_default.png",
                 warningimgpath4: "../../static/images/camera_default.png"
             },
-            CruiseLine:'巡航线1',
+            CruiseLine: '巡航线1',
             WarningImgIndex: [false, false, false, false],
             ws: null, //建立的连接
             lockReconnect: false, //是否真正建立连接
@@ -289,8 +312,15 @@ export default {
             isDestroyed: false, // 关闭或切换页面，是否断开
 
             dialogPresetVisible: false,
+            cruiseLineVisible: false, //添加巡航线
+            checkAll: false,
+            checkedLines: [],
+            cities: cityOptions,
+            isIndeterminate: true,
             istruefalse: true,
             checkList: [],
+            trackIdparaVisible: false, //更改跟踪参数
+
             ptzconfig: {
                 id: 0,
                 ip: "10.10.10.219",
@@ -355,7 +385,9 @@ export default {
             preset_token: "",
             preset_name: "",
             preset_ai: [],
-            presetinfotableData: [],
+            presetinfotableData: [
+                { token: "1", name: "东南角预设点", algorithm: ["无"], show: false },
+            ],
             presetinfotableData2: [],
             tableData: [
                 { token: "1", name: "东南角预设点", algorithm: ["无"], show: false },
@@ -383,6 +415,7 @@ export default {
                 videoElement.play();
             }
         },
+        // 增加预置点>弹窗>确认
         addPreset() {
             ptzpresetControl({
                 ptzpreset: "setpreset",
@@ -446,6 +479,7 @@ export default {
             //   });
             // };
         },
+        // 添加球机
         GetUrlPTZ() {
             ptzipControl({
                 ptzip: this.ptzconfig.ip,
@@ -516,7 +550,7 @@ export default {
         //   });
         //   console.log(this.add_addr);
         // },
-
+        // 删除球机
         ListCamera() {
             getlist({}).then((res) => {
                 if (res.code === 2200) {
@@ -532,7 +566,7 @@ export default {
                 }
             });
         },
-
+        // 操作中的保存
         downsendPreset() {
             ptzdownControl({ ptz_area_msg: JSON.stringify(this.area) }).then(res => {
                 let data = res.data;
@@ -554,6 +588,7 @@ export default {
             //   }
             // });
         },
+        // 目标跟踪开关
         downsendInfo() {
             if (this.istruefalse) {
                 ptzdownControl({ ptz_send_msg: "star" }).then(res => {
@@ -577,6 +612,7 @@ export default {
                 })
             }
         },
+        // 更改跟踪方式
         downSendTrackIdInfo() {
             ptzdownControl({ ptz_track_id_msg: this.autotrackid, ptz_track_mode_msg: this.choosetrackmodule }).then(res => {
                 let data = res.data;
@@ -587,6 +623,7 @@ export default {
                 }
             })
         },
+        // 操作中的保存
         savePreset(row) {
             ptzpresetControl({
                 ptzpreset: "setpreset",
@@ -601,6 +638,7 @@ export default {
                 }
             });
         },
+        // 操作中的删除
         deletePreset(row) {
             ptzpresetControl({
                 ptzpreset: "deletepreset",
@@ -613,6 +651,7 @@ export default {
                 }
             });
         },
+        // 操作中的调用
         gotoPreset(row) {
             ptzpresetControl({
                 ptzpreset: "gotopreset",
@@ -646,12 +685,38 @@ export default {
                 }
             });
             if (this.presetinfotableData.length === 0) {
-                this.$message.warning("11111111111111");
+                // this.$message.warning("11111111111111");
                 console.log(7777)
                 console.log(this.presetinfotableData2)
                 this.presetinfotableData = this.presetinfotableData2;
                 console.log(this.presetinfotableData)
             }
+        },
+        // 添加巡航线
+        addCruiseLine() {
+            ajax.get("api/v1/ptz/ptzsend", {
+                params: {
+                    ptz_cruise_line_msg: "123"
+                }
+            }).then(function (res) {
+                console.log('添加巡航线', res.data);
+                console.log(response);
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        handleCheckAllChange(val) {
+            this.checkedLines = val ? cityOptions : [];
+            this.isIndeterminate = false;
+        },
+        handleCheckedCitiesChange(value) {
+            let checkedCount = value.length;
+            this.checkAll = checkedCount === this.cities.length;
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
+        },
+        // 更改跟踪参数
+        downSendTrackIdpara() {
+            ajax.get("",{params:{}}).then(function(res){}).catch(function(error){console.log(error);});
         },
         ControlStop() {
             ptzsendControl({ ptz: "s" }).then((res) => {
@@ -939,6 +1004,13 @@ export default {
 </script>
 
 <style scoped>
+.clearfix::before,
+.clearfix::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
 .content {
     width: 100%;
     height: 100%;
@@ -999,6 +1071,11 @@ export default {
   background-size: 100%; */
     /* border: 1px solid #00B0F0; */
     position: relative;
+}
+
+.left .left-top .bigimg .img-div {
+    width: 100%;
+    height: 100%;
 }
 
 .left .left-top .bigimg .switch {
@@ -1066,6 +1143,7 @@ export default {
     color: #fff;
 }
 
+
 .left .left-bottom {
     width: 99%;
     height: 23%;
@@ -1105,32 +1183,223 @@ export default {
     background-color: #0b3d51;
 }
 
+/* right-top */
 .right .right-top {
-    width: 100%;
-    height: 50%;
-    border-radius: 5px;
-    /* background-color: #00b0f0; */
-}
-
-.right .right-top .center-box {
-    width: 96%;
-    height: 96%;
+    width: 94%;
+    height: 49%;
+    background-color: rgba(4, 30, 43, 0.8);
     margin-left: 2%;
     margin-top: 2%;
-    /* background-color: antiquewhite; */
+    border-radius: 5px;
+
 }
 
-.right .right-top .center-box .channel-select>>>.el-descriptions-item__label:not(.is-bordered-label) {
+.right .right-top .PTZ-botton {
+    width: 100%;
+    background-color: #041e2b;
+}
+
+.right .right-top .PTZ-botton .bottons-box {
+    width: 100%;
+    height: 100%;
+}
+
+.right .right-top .PTZ-botton .bottons-box .bottons {
+    width: 100%;
+    padding-top: 2%;
+}
+
+/* right 焦距 */
+.bottons-left {
+    width: 45%;
+    float: left;
+    margin-left: 3%;
+}
+
+.right .right-top .PTZ-botton .bottons-box .bottons .row {
+    /* width: 96%; */
+    height: 100%;
+    padding-bottom: 3.5%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.right .right-top .PTZ-botton .bottons-box .bottons .row .item {
+    width: 30%;
+    height: 38px;
+    background-color: #15718e;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    cursor: pointer;
+}
+
+.right .right-top .PTZ-botton .bottons-box .bottons .row .item img {
+    width: 60%;
+    height: 60%;
+}
+
+.right .right-top .PTZ-botton .bottons-box .bottons .row .item i {
+    color: #041e2b;
+    font-size: 2.5vw;
+}
+
+.right .right-top .PTZ-botton .bottons-box .bottons .row .items {
+    width: 12%;
+    height: 99%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.right .right-top .PTZ-botton .bottons-box .bottons .row .items {
+    font-size: 0.5vw;
+}
+
+/* right  input输入等 */
+.bottons-right {
+    width: 45%;
+    float: right;
+    margin-right: 3%;
+}
+
+.right .right-top .PTZ-botton .bottons-box .title {
+    color: #fff;
+}
+
+.bottons-right-one {
+    margin-bottom: 2%;
+}
+
+/* 添加/删除球机 */
+.right .right-top .ctrl-bottons {
+    display: flex;
+    justify-content: space-around;
+    margin: 0.1% 0.5%;
+    cursor: pointer;
+    color: #fff;
+}
+
+.right .right-top .ctrl-bottons .bottons-right-two {
+    /* height: 80%; */
+    width: 45%;
+    background-color: #0b3d51;
+    text-align: center;
+    padding: 1.5% 0;
+    border-radius: 4px;
+    margin-bottom: 2%;
+}
+.right .right-top .ctrl-bottons .bottons-right-two:hover{
+    color: #00b0f0;
+    background-color: #15718e;
+}
+
+/* 增加预置点等按钮 */
+.right .right-top .ctrl-botton {
+    width: 100%;
+    height: 13%;
+    background-color: #041e2b;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+}
+
+/* 增加预置点弹窗 */
+.add_preset_style {
+    display: flex;
+    white-space: nowrap;
+    width: 60%;
+    margin: 0 auto;
+    align-content: space-around;
+    align-items: center;
+    margin-top: 1%;
+    color: #fff;
+}
+
+.add_preset_style span {
+    width: 35%;
+}
+
+.ctrl-botton>>>.el-dialog__header {
+    background-color: #041e2b;
+    padding: 10px 20px 10px;
+    /* line-height: 54px; */
+}
+
+.ctrl-botton>>>.el-dialog__headerbtn {
+    top: 12px;
+}
+
+.ctrl-botton>>>.el-dialog__title {
+    /* background-color: #06212c;
+     */
+    color: #fff;
+}
+
+.ctrl-botton>>>.el-dialog__body {
+    background-color: #0b3d51;
+}
+
+.ctrl-botton>>>.el-dialog__footer {
+    background-color: #0b3d51;
+}
+
+.ctrl-botton>>>.el-select {
+    width: 100%;
+}
+
+.ctrl-botton>>>.el-checkbox__label {
+    color: #fff;
+}
+
+.right .right-top .ctrl-botton .button {
+    width: 30%;
+    height: 80%;
+    color: #fff;
+    border-radius: 3px;
+    background-color: #0b3d51;
+    margin-bottom: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.right .right-top .ctrl-botton .button:hover {
+    color: #00b0f0;
+    background-color: #15718e;
+}
+
+
+
+.right .right-bottom {
+    width: 98%;
+    height: 50%;
+    border-radius: 5px;
+    margin-left: 2%;
+}
+
+.right .right-bottom .center-box {
+    width: 96%;
+    height: 96%;
+    /* background-color:red; */
+    margin-top: 2%;
+}
+
+.right .right-bottom .center-box .channel-select>>>.el-descriptions-item__label:not(.is-bordered-label) {
     line-height: 200%;
 }
 
-.right .right-top .center-box .default-list {
+.right .right-bottom .center-box .default-list {
     width: 100%;
     height: 90%;
-    /* background-color: #00b0f0; */
 }
 
-.right .right-top .center-box .default-list .select-title {
+.right .right-bottom .center-box .default-list .select-title {
     width: 100%;
     height: 8%;
     padding-top: 2%;
@@ -1140,7 +1409,7 @@ export default {
     justify-content: space-around;
 }
 
-.right .right-top .center-box .default-list .select-title .arrow {
+.right .right-bottom .center-box .default-list .select-title .arrow {
     width: 20%;
     height: 100%;
     position: relative;
@@ -1148,30 +1417,57 @@ export default {
     color: #fff;
 }
 
-.right .right-top .center-box .default-list .select-title .arrow:hover {
+.right .right-bottom .center-box .default-list .select-title .arrow:hover {
     color: #00b0f0;
 }
 
-.right .right-top .center-box .default-list .select-title .arrow i {
+.right .right-bottom .center-box .default-list .select-title .arrow i {
     position: absolute;
     left: 40%;
     top: 10%;
 }
 
-.right .right-top .center-box .default-list .select-title h3 {
+.right .right-bottom .center-box .default-list .select-title h3 {
     width: 60%;
     text-align: center;
 }
 
-.right .right-top .center-box .default-list .selected-list {
+/* 表单 */
+.right .right-bottom .center-box .default-list .selected-list {
     width: 100%;
     height: 100%;
-    background-color: #15718e;
-    overflow-y: scroll;
     position: relative;
 }
 
-.right .right-top .center-box .default-list .selected-list .table-add {
+.right .right-bottom .center-box .default-list .selected-list>>>.el-table__empty-block {
+    /* height: 96%; */
+    background-color: #062534;
+}
+
+/* .right .right-bottom .center-box .default-list .selected-list>>> .el-table__body{
+    overflow-y: scroll;
+} */
+
+/* 去除底部白线 */
+.el-table::before {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 0px;
+}
+
+.selected-list>>>.el-table__body-wrapper::-webkit-scrollbar {
+    width: 100%;
+    height: 100%;
+}
+
+.selected-list>>>.el-scrollbar__wrap::-webkit-scrollbar {
+    width: 100%;
+    height: 100%;
+
+}
+
+.right .right-bottom .center-box .default-list .selected-list .table-add {
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -1181,203 +1477,5 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.right .right-bottom {
-    width: 96%;
-    height: 50.5%;
-    margin-left: 1.5%;
-    margin-top: 0%;
-    /* background-color: #00b0f0; */
-}
-
-.right .right-bottom .ctrl-botton {
-    width: 100%;
-    height: 13%;
-    background-color: #041e2b;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.right .right-bottom .ctrl-botton .button {
-    width: 30%;
-    height: 80%;
-    color: #fff;
-    border-radius: 3px;
-    background-color: #0b3d51;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    cursor: pointer;
-}
-
-.right .right-bottom .ctrl-botton .button:hover {
-    color: #00b0f0;
-    background-color: #15718e;
-}
-.right .right-bottom .ctrl-bottons {
-    width: 100%;
-    height: 11%;    
-    background-color: #041e2b;
-    padding-top: 1%;
-    display: flex;
-    /* flex-direction: row; */
-    justify-content: space-around;
-    /* flex: 1; */
-    /* align-items: center; */
-}
-
-.right .right-bottom .PTZ-botton {
-    width: 100%;
-    height: 80%;
-    background-color: #041e2b;
-}
-
-.right .right-bottom .PTZ-botton .bottons-box {
-    width: 100%;
-    height: 100%;
-    /* background-color: #00b0f0; */
-}
-
-.right .right-bottom .ctrl-bottons .bottons-suodinginput {
-    width: 45%;
-    /* height: 100%; */
-    float: left;
-    /* padding-top: 5%; */
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .title {
-    color: #fff;
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .bottons {
-    width: 100%;
-    height: 100%;
-    padding-top: 0%;
-    /* background-color: #00b0f0; */
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .bottons .row {
-    width: 96%;
-    height: 100%;
-    margin-top: 3.5%;
-    margin-left: 1%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .bottons .row .item {
-    width: 30%;
-    height: 37px;
-    background-color: #15718e;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    cursor: pointer;
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .bottons .row .item img {
-    width: 60%;
-    height: 60%;
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .bottons .row .item i {
-    color: #041e2b;
-    font-size: 2.5vw;
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .bottons .row .items {
-    width: 12%;
-    height: 99%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    /* cursor: pointer; */
-    /* background-color: #15718E; */
-}
-
-.right .right-bottom .PTZ-botton .bottons-box .bottons .row .items {
-    font-size: 0.5vw;
-}
-
-.save-info {
-    width: 13%;
-    margin-left: 15%;
-    float: left;
-    border-radius: 5px;
-    border: 1px solid #8adeff;
-    background: none;
-    color: #8adeff;
-    cursor: pointer;
-}
-
-.el-input-padding>>>.el-input__inner {
-    padding: 0 0;
-}
-
-.bottons-right-one {
-    /* width: 100%; */
-    /* padding-right: 5%; */
-    padding-top: 4%;
-    float: left;
-}
-
-.right .right-bottom .bottons-right-two {
-    /* height: 100%; */
-    width: 100%;
-    float: left;
-    padding-top: 4%;
-    /* background-color: #041e2b; */
-    /* display: flex; */
-    /* flex-direction: row; */
-    /* justify-content: space-around; */
-    /* align-items: center; */
-}
-
-.right .right-bottom .bottons-right-two .button-two {
-    /* width: 80%; */
-    /* height: 80%; */
-    padding: 1.5% 0;
-    color: #fff;
-    background-color: #0b3d51;
-    border-radius: 3px;
-    text-align: center;
-    /* display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center; */
-    cursor: pointer;
-}
-
-.bottons-left {
-    width: 45%;
-    float: left;
-    padding-left: 3%;
-    /* background-color: #00b0f0; */
-}
-
-.bottons-right {
-    width: 45%;
-    float: right;
-    padding-right: 2.5%;
-    /* background-color: #fff; */
-}
-
-.left .left-top .bigimg .img-div {
-    width: 100%;
-    height: 100%;
-}
-
-.add_preset_style {
-    width: 50%;
-    padding-left: 20%;
-    padding-top: 1%;
 }
 </style>

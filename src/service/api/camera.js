@@ -77,11 +77,11 @@ export async function ptzsendControl(data, url = ptzUrl.ptz){
 export async function ptzinitControl(data, url = ptzUrl.ptzinit){
   return await fetchGet(url, data);
 }
-
+// 操作中的保存
 export async function ptzpresetControl(data, url = ptzUrl.ptzpreset){
   return await fetchGet(url, data);
 }
-
+// 添加球机
 export async function ptzipControl(data, url = ptzUrl.ptzip){
   return await fetchGet(url, data);
 }
