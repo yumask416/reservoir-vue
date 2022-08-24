@@ -12,7 +12,7 @@ export const baseURL = {
   rk225: 'http://10.10.10.225:10225',
   bt226: 'http://10.10.10.226:10225',
   bt119: 'http://10.10.10.119:10225',
-}.shuiku
+}.bt226
 axios.defaults.baseURL = baseURL
 
 export const ImageBaseURL = baseURL

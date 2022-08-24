@@ -279,6 +279,7 @@
 import $ from "jquery";
 import flv from "flv.js";
 import ajax from "axios";
+import { wsEvent } from '../service/ws-api'
 import {
     ptzsendControl,
     ptzinitControl,
@@ -398,6 +399,9 @@ export default {
         };
     },
     methods: {
+        ptzWebSocket(){
+            console.log(1111);
+        },
         tableRowStyle({ row, rowIndex }) {
             return "padding: 0px;font-size:0.8vw;text-align: center;background-color: #15718E;border-bottom: 1px solid #3DBAF1;color: #fff;";
         },
@@ -981,6 +985,7 @@ export default {
         let stream_1 = "http://10.10.10.241/flv?port=1985&app=myapp&stream=testv";
         this.play_stream(stream_1, player_1);
         this.monitorWebsocket(); // websocket 监听事件
+        let ws = wsEvent.start(this.ptzWebSocket)
     },
 
     created() {
@@ -994,6 +999,7 @@ export default {
         //页面销毁时关闭长连接
         // this.wsReconnect();
         // window.addEventListener('beforeunload', e => this.wsReconnect(e))
+        wsEvent.end(ws)
     },
     beforeDestroy() {
         this.isDestroyed = true;
