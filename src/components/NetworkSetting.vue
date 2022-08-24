@@ -8,7 +8,7 @@
             <div id="network_ip_pattern" class="nework_cell">
               <span>模式：</span>
               <div class="n_input">
-                <el-select v-model="pattern_val" class="m-2" size="large" @change="ModSelect">
+                <el-select v-model="pattern_val" class="m-2" size="large" @change="ModSelect" style="width: 32%;">
                     <el-option
                     v-for="item in pattern_opt"
                     :key="item.value"
@@ -22,7 +22,7 @@
             <div id="network_card" class="nework_cell">
               <span>网卡选择：</span>
               <div class="n_input">
-                <el-select v-model="card_val" class="m-2" placeholder="Select" size="large" @change="CardSelect">
+                <el-select v-model="card_val" class="m-2" placeholder="Select" size="large" @change="CardSelect" style="width: 32%;">
                     <el-option
                     v-for="item in card_opt"
                     :key="item.value"
