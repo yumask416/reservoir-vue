@@ -220,9 +220,9 @@
                 <div class="center-box">
                     <div class="default-list">
                         <div class="select-title">
-                            <div class="arrow"><i class="el-icon-caret-left"></i></div>
+                            <!-- <div class="arrow"><i class="el-icon-caret-left"></i></div> -->
                             <h3>{{ CruiseLine }}</h3>
-                            <div class="arrow"><i class="el-icon-caret-right"></i></div>
+                            <!-- <div class="arrow"><i class="el-icon-caret-right"></i></div> -->
                         </div>
                         <div class="selected-list">
                             <div class="table">
@@ -301,7 +301,7 @@ export default {
                 warningimgpath3: "../../static/images/camera_default.png",
                 warningimgpath4: "../../static/images/camera_default.png"
             },
-            CruiseLine: '巡航线1',
+            CruiseLine: '巡航线',
             WarningImgIndex: [false, false, false, false],
             ws: null, //建立的连接
             lockReconnect: false, //是否真正建立连接
@@ -985,7 +985,7 @@ export default {
         let stream_1 = "http://10.10.10.241/flv?port=1985&app=myapp&stream=testv";
         this.play_stream(stream_1, player_1);
         this.monitorWebsocket(); // websocket 监听事件
-        let ws = wsEvent.start(this.ptzWebSocket)
+        let ws = wsEvent.start(this.ptzWebSocket);
     },
 
     created() {
