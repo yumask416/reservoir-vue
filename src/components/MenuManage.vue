@@ -13,7 +13,7 @@
                 <h4 class="menu-h4">功能与服务</h4>
                 <div class="menu-guide">
                     <div class="menu-cell" @click="ToSingle(0)" @mouseenter="BackGround(0)" @mouseleave="BackGroundOut(0)" v-bind:style="{background: MenuColor[0].color}"><span>实时告警</span></div>
-                    <div class="menu-cell" @click="ToSecurity(1)" @mouseenter="BackGround(1)" @mouseleave="BackGroundOut(1)" v-bind:style="{background: MenuColor[1].color}"><span>安全卸油</span></div>
+                    <!-- <div class="menu-cell" @click="ToSecurity(1)" @mouseenter="BackGround(1)" @mouseleave="BackGroundOut(1)" v-bind:style="{background: MenuColor[1].color}"><span>安全卸油</span></div> -->
                     <div class="menu-cell" @click="ToWarning(2)" @mouseenter="BackGround(2)" @mouseleave="BackGroundOut(2)" v-bind:style="{background: MenuColor[2].color}"><span>告警中心</span></div>
                     <div class="menu-cell" @click="ToHistory(3)" @mouseenter="BackGround(3)" @mouseleave="BackGroundOut(3)" v-bind:style="{background: MenuColor[3].color}"><span>历史事件</span></div>
                     <div class="menu-cell" @click="ToPTZ(4)" @mouseenter="BackGround(4)" @mouseleave="BackGroundOut(4)" v-bind:style="{background: MenuColor[4].color}"><span>云台球机</span></div>

@@ -167,7 +167,8 @@
                     <!-- 增加预置点 -->
                     <div class="button" @click="printPreset(), dialogPresetVisible = true"><span>增加预置点</span></div>
                     <template>
-                        <el-dialog class="dialogPreset" title="增加预置点" :visible.sync="dialogPresetVisible" width="40%">
+                        <el-dialog class="dialogPreset" @close="closeDialog" title="增加预置点"
+                            :visible.sync="dialogPresetVisible" width="40%">
                             <div class="add_preset_style">
                                 <span>预置点ID:</span>
                                 <el-input v-model="preset_token" placeholder="预置点ID" size="small"></el-input>
@@ -195,7 +196,7 @@
                     <div class="button" @click="printPreset(), PresetVisible = true"><span>显示预置点</span></div>
                     <template>
                         <el-dialog class="dialogPrint" title="显示预置点" :visible.sync="PresetVisible" width="40%">
-                            <el-table :data="printData" class="table">
+                            <el-table :data="presetinfotableData2" class="table">
                                 <el-table-column property="token" label="预置点ID" align="center" width="80">
                                     <template slot-scope="scope">
                                         <el-input size="small" v-model="scope.row.token" v-if="scope.row.show"
@@ -217,18 +218,18 @@
                                             <i class="el-icon-position" style="cursor: pointer"
                                                 @click="gotoPreset(scope.row)"></i>
                                         </el-tooltip>
-                                        <el-tooltip class="item" effect="dark" content="保存" placement="top">
+                                        <!-- <el-tooltip class="item" effect="dark" content="保存" placement="top">
                                             <i class="el-icon-document-copy" style="cursor: pointer"
                                                 @click="savePreset(scope.row)"></i>
-                                        </el-tooltip>
+                                        </el-tooltip> -->
                                         <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                             <i class="el-icon-delete-solid" style="cursor: pointer"
                                                 @click="deletePreset(scope.row)"></i>
                                         </el-tooltip>
-                                        <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                        <!-- <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                                             <i class="el-icon-s-claim" style="cursor: pointer"
                                                 @click="editPreset(scope.row)"></i>
-                                        </el-tooltip>
+                                        </el-tooltip> -->
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -236,31 +237,99 @@
                     </template>
                     <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
                     <!-- 添加巡航线 -->
-                    <div class="button" @click="addCruiseLine(), cruiseLineVisible = true"><span>添加巡航线</span></div>
+                    <div class="button" @click="printPreset(), cruiseLineVisible = true"><span>添加巡航线</span></div>
                     <template>
-                        <el-dialog :visible.sync="cruiseLineVisible" title="添加巡航线" width="50%">
-                            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
-                                @change="handleCheckAllChange">全选</el-checkbox>
+                        <el-dialog :visible.sync="cruiseLineVisible" title="添加巡航线" width="50%" @close="closeDialog">
+                            <!-- <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
+                                @change="handleCheckAllChange">全选</el-checkbox> -->
                             <div style="margin: 15px 0;"></div>
-                            <el-checkbox-group v-model="checkedLines" @change="handleCheckedCitiesChange">
-                                <el-checkbox v-for="(city, index) in cities" :label="city" :key="index">{{ index + 1 }}
+                            <el-checkbox-group v-model="checkedLines" @change="handleCheckedLinesChange">
+                                <el-checkbox v-for="item in presetinfotableData2" :label="item" :key="item.token">{{
+                                        item.token
+                                }}
                                     {{
-                                            city
+                                            item.name
                                     }}</el-checkbox>
                             </el-checkbox-group>
                             <span slot="footer" class="dialog-footer">
                                 <el-button @click="cruiseLineVisible = false" size="small">取 消</el-button>
-                                <el-button type="primary" @click="cruiseLineVisible = false" size="small">确 定
+                                <el-button type="primary" @click="addCruiseLine(), cruiseLineVisible = false"
+                                    size="small">确 定
                                 </el-button>
                             </span>
                         </el-dialog>
                     </template>
                     <!-- 更改跟踪参数 -->
-                    <div class="button" @click="downSendTrackIdpara(), trackIdparaVisible = true"><span>更改跟踪参数</span>
+                    <div class="button" @click="trackIdparaVisible = true"><span>更改跟踪参数</span>
                     </div>
                     <template>
-                        <el-dialog :visible.sync="trackIdparaVisible" title="更改跟踪参数" width="50%">
-
+                        <el-dialog class="TrackIdparaDialog" :visible.sync="trackIdparaVisible" title="更改跟踪参数"
+                            width="50%">
+                            <el-form ref="form" :model="form">
+                                <el-form-item label="累计帧数缩放图像阈值">
+                                    <el-input v-model="form.large_small_count_threshold" size="small"
+                                        placeholder="请输入累计帧数缩放图像阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label="累计帧数移动云台阈值">
+                                    <el-input v-model="form.autotrack_move_count_threshold" size="small"
+                                        placeholder="请输入累计帧数移动云台阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label=" 图像放大宽阈值">
+                                    <el-input v-model="form.width_large_threshold" size="small"
+                                        placeholder="请输入图像放大宽阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label="图像放大高阈值">
+                                    <el-input v-model="form.height_large_threshold" size="small"
+                                        placeholder="请输入图像放大高阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label="图像放大面积阈值">
+                                    <el-input v-model="form.area_large_threshold" size="small"
+                                        placeholder="请输入图像放大面积阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label="图像缩小宽阈值">
+                                    <el-input v-model="form.width_small_threshold" size="small"
+                                        placeholder="请输入图像缩小宽阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label="图像缩小高阈值">
+                                    <el-input v-model="form.height_small_threshold" size="small"
+                                        placeholder="请输入图像缩小高阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label="图像缩小面积阈值">
+                                    <el-input v-model="form.area_small_threshold" size="small"
+                                        placeholder="请输入图像缩小面积阈值"></el-input>
+                                </el-form-item>
+                                <el-form-item label="无目标时超时复位时间">
+                                    <el-input v-model="form.time_track_var_three" size="small"
+                                        placeholder="请输入无目标时超时复位时间"></el-input>
+                                </el-form-item>
+                                <el-form-item label="有目标时超时抓拍返回巡航时间">
+                                    <el-input v-model="form.time_track_var_one" size="small"
+                                        placeholder="请输入有目标时超时抓拍返回巡航时间"></el-input>
+                                </el-form-item>
+                                <el-form-item label="抓拍后延时时间">
+                                    <el-input v-model="form.time_track_var_two" size="small" placeholder="请输入抓拍后延时时间">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="移动速度">
+                                    <el-input v-model="form.moveSpeed" size="small" placeholder="请输入移动速度"></el-input>
+                                </el-form-item>
+                                <el-form-item label="变焦速度">
+                                    <el-input v-model="form.focalSpeed" size="small" placeholder="请输入变焦速度"></el-input>
+                                </el-form-item>
+                                <el-form-item label="移动延时">
+                                    <el-input v-model="form.moveDelayTime" size="small" placeholder="请输入移动延时">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="变焦延时">
+                                    <el-input v-model="form.focalDelayTime" size="small" placeholder="请输入变焦延时">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item class="TrackIdparaBtn">
+                                    <el-button @click="trackIdparaVisible = false" size="small">取消</el-button>
+                                    <el-button type="primary" @click="downSendTrackIdpara(), onSubmit" size="small">确定
+                                    </el-button>
+                                </el-form-item>
+                            </el-form>
                         </el-dialog>
                     </template>
                     <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
@@ -274,6 +343,7 @@
                             <h3>{{ CruiseLine }}</h3>
                             <!-- <div class="arrow"><i class="el-icon-caret-right"></i></div> -->
                         </div>
+                        <!-- 巡航线 -->
                         <div class="selected-list">
                             <div class="table">
                                 <el-table :data="presetinfotableData" tooltip-effect="dark" :cell-style="tableRowStyle"
@@ -337,6 +407,7 @@ import {
     ptzpresetControl,
     ptzlineControl,
     ptzipControl,
+    TrackIdparaControl,
     ptzadd,
     getlist,
     ptzdownControl,
@@ -367,28 +438,15 @@ export default {
             dialogPresetVisible: false, //添加预置点
             PresetVisible: false,  //显示预置点
             printData: [
-                {
-                    token: '1',
-                    name: '东南',
-                    ai: '打电话'
-                },
-                {
-                    token: '2',
-                    name: '西南',
-                    ai: '明火'
-                },
-                {
-                    token: '3',
-                    name: '东北',
-                    ai: 'chouy'
-                },
-                {
-                    token: '4',
-                    name: '西北',
-                    ai: '入侵检测'
-                },
+                // {
+                //     token: '',
+                //     name: '',
+                //     ai: ''
+                // }
             ],
             cruiseLineVisible: false, //添加巡航线
+            token: '',
+            tokens: [],
             checkAll: false,
             checkedLines: [],
             cities: LineOptions,
@@ -396,13 +454,30 @@ export default {
             istruefalse: true,
             checkList: [],
             trackIdparaVisible: false, //更改跟踪参数
+            form: {
+                large_small_count_threshold: 1,
+                autotrack_move_count_threshold: 3,
+                width_large_threshold: 0.3,
+                height_large_threshold: 0.4,
+                area_large_threshold: 0.15,
+                width_small_threshold: undefined,
+                height_small_threshold: undefined,
+                area_small_threshold: undefined,
+                time_track_var_three: 30,
+                time_track_var_one: 60,
+                time_track_var_two: 7,
+                moveSpeed: 0.1,
+                focalSpeed: 0.1,
+                moveDelayTime: 100000,
+                focalDelayTime: 10000
+            },
 
             ptzconfig: {
                 id: 0,
                 ip: "10.10.10.219",
                 url: "0.0.0.0:0",
                 username: "admin",
-                password: "AGvay+123456",
+                password: "AGvay123456",
                 add_name: "ptz1",
                 add_addr: "",
             },
@@ -427,25 +502,7 @@ export default {
             AIalgorithm: [
                 {
                     value: 'A01',
-                    label: "打电话",
-                }, {
-                    value: 'A02',
-                    label: "抽烟",
-                }, {
-                    value: 'A03',
-                    label: "明火",
-                }, {
-                    value: 'A04',
-                    label: "打电话",
-                }, {
-                    value: 'A05',
-                    label: "烟雾",
-                }, {
-                    value: 'A06',
-                    label: "灭火器",
-                }, {
-                    value: 'A07',
-                    label: "入侵检测"
+                    label: "入侵检测-人员",
                 }],
             area: {
                 token: "1",
@@ -460,16 +517,16 @@ export default {
             isBigImg: false,
             preset_token: "",
             preset_name: "",
-            preset_ai: [],
+            preset_ai: ['入侵检测-人员'],
             presetinfotableData: [
-                { token: "1", name: "东南角预设点", algorithm: ["无"], show: false },
+                // { token: "1", name: "东南角预设点", algorithm: ["无"], show: false },
             ],
             presetinfotableData2: [],
             tableData: [
-                { token: "1", name: "东南角预设点", algorithm: ["无"], show: false },
-                { token: "2", name: "西南角预设点", algorithm: ["无"], show: false },
-                { token: "3", name: "东南角预设点", algorithm: ["无"], show: false },
-                { token: "4", name: "西南角预设点", algorithm: ["无"], show: false },
+                { token: "1", name: "东南角预设点", algorithm: ["入侵检测-人员"], show: false },
+                { token: "2", name: "西南角预设点", algorithm: ["入侵检测-人员"], show: false },
+                { token: "3", name: "东南角预设点", algorithm: ["入侵检测-人员"], show: false },
+                { token: "4", name: "西南角预设点", algorithm: ["入侵检测-人员"], show: false },
             ],
         };
     },
@@ -508,8 +565,9 @@ export default {
                         name: this.preset_name,
                         ai: this.preset_ai,
                     };
-                    this.presetinfotableData.push(presetinfoDate);
-                    this.$message.success("发送成功");
+                    // this.presetinfotableData.push(presetinfoDate);
+                    this.$message.success("添加成功");
+                    this.printPreset()
                 } else {
                     this.$message.warning(res.msg);
                 }
@@ -566,7 +624,7 @@ export default {
             }).then((res) => {
                 if (res.code === 2200) {
                     (this.ptzconfig.url = res.data),
-                        console.log(res.data),
+                        // console.log(res.data),
                         console.log("获取url成功"),
                         ptzinitControl({
                             ptzurl: this.ptzconfig.url,
@@ -584,7 +642,7 @@ export default {
                                 }).then((res) => {
                                     if (res.code === 2200) {
                                         this.ptzconfig.id = res.data.id;
-                                        console.log(res.data.id);
+                                        // console.log(res.data.id);
                                         console.log("摄像头添加成功");
                                         ptzdowninitControl({
                                             ptz_init_id_msg: this.ptzconfig.id,
@@ -605,7 +663,7 @@ export default {
                                             ptz_init_ip_msg: this.ptzconfig.ip,
                                             ptz_init_name_msg: this.ptzconfig.username,
                                             ptz_init_pass_msg: this.ptzconfig.password,
-                                            ptz_init_rtsp_msg: this.ptzconfig.add_addr,
+                                            ptz_init_rtsp_msg: this.ptzconfig.add_addr
                                         }).then((res) => {
                                             if (res.code === 2200) {
 
@@ -730,6 +788,10 @@ export default {
                 }
             })
         },
+        // 更改跟踪参数
+        onSubmit() {
+            console.log('submit!');
+        },
         // 操作中的保存
         savePreset(row) {
             ptzpresetControl({
@@ -748,16 +810,34 @@ export default {
         },
         // 操作中的删除
         deletePreset(row) {
-            ptzpresetControl({
-                ptzpreset: "deletepreset",
-                ptzpresettoken: row.token,
-            }).then((res) => {
-                if (res.code == 2200) {
-                    this.$message.success("发送成功");
-                } else {
-                    this.$message.warning(res.msg);
-                }
+            this.$confirm('是否确认删除此预置点?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+                ptzpresetControl({
+                    ptzpreset: "deletepreset",
+                    ptzpresettoken: row.token,
+                }).then((res) => {
+                    if (res.code == 2200) {
+                        // this.$message.success("发送成功");
+                        this.printPreset()
+
+                    } else {
+                        this.$message.warning(res.msg);
+                    }
+                });
+            }).catch(() => {
+                // this.$message({
+                //     type: 'info',
+                //     message: '已取消删除'
+                // });
             });
+
         },
         // 操作中的调用
         gotoPreset(row) {
@@ -781,14 +861,21 @@ export default {
         printPreset() {
             ptzpresetControl({ ptzpreset: "getpreset" }).then((res) => {
                 if (res.code == 2200) {
+                    console.log('res.data', res.data)
+                    this.printData = res.data
+                    console.log('this.printData', this.printData)
+                    // for(var i = 0;i < this.printData.length;i++){
+
+                    // }
                     this.presetinfotableData2.length = 0;
                     for (let i = 0; i <= res.data.length; i++) {
                         let presetDate = {
                             token: res.data[i]["-token"],
                             name: res.data[i].Name,
-                            ai: "无",
+                            ai: "入侵检测-人员",
                         };
                         this.presetinfotableData2.push(presetDate);
+                        // console.log('this.presetinfotableData2',this.presetinfotableData2);
                     }
                 } else {
                     this.$message.warning(res.msg);
@@ -796,42 +883,59 @@ export default {
             });
             if (this.presetinfotableData.length === 0) {
                 // this.$message.warning("11111111111111");
-                console.log(7777)
-                console.log(this.presetinfotableData2)
-                this.presetinfotableData = this.presetinfotableData2;
-                console.log(this.presetinfotableData)
+                // console.log(7777)
+                // console.log(this.presetinfotableData2)
+                // this.presetinfotableData = this.presetinfotableData2;
+                // console.log(this.presetinfotableData)
             }
+        },
+        //关闭弹窗
+        closeDialog() {
+            // console.log(123456)
+            this.preset_token = "",
+                this.preset_name = "",
+                this.preset_ai = [],
+                this.checkedLines = []
+            this.isIndeterminate = false
         },
         // 添加巡航线
         addCruiseLine() {
-            ptzlineControl({ ptz_cruise_line_msg: '2' }).then((res) => {
-                if (res.code == 220) {
+            console.log('添加', this.checkedLines)
+            // let tokens = []
+            for (var i = 0; i < this.checkedLines.length; i++) {
+                this.presetinfotableData.push(this.checkedLines[i])
+                this.tokens.push(this.checkedLines[i].token)
+                this.token = this.tokens.join(',')
+                console.log('this.presetinfotableData', this.presetinfotableData);
+            }
+            ptzlineControl({ ptz_cruise_line_msg: this.token }).then((res) => {
+                if (res.code == 2200) {
                     console.log('成功');
                 }
             })
-            // ajax.get("api/v1/ptz/ptzsend", {
-            //     params: {
-            //         ptz_cruise_line_msg: "123"
-            //     }
-            // }).then(function (res) {
-            //     console.log('添加巡航线', res.data);
-            //     console.log(response);
-            // }).catch(function (error) {
-            //     console.log(error);
-            // });
         },
         handleCheckAllChange(val) {
-            this.checkedLines = val ? LineOptions : [];
+            console.log('全选', val);
+            this.checkedLines = val ? this.presetinfotableData2 : [];
+            console.log('this.checkedLines', this.checkedLines)
             this.isIndeterminate = false;
         },
-        handleCheckedCitiesChange(value) {
+        handleCheckedLinesChange(value) {
+            console.log('value', value);
             let checkedCount = value.length;
-            this.checkAll = checkedCount === this.cities.length;
-            this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
+            this.checkAll = checkedCount === this.presetinfotableData2.length;
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.presetinfotableData2.length;
         },
         // 更改跟踪参数
         downSendTrackIdpara() {
-            ajax.get("", { params: {} }).then(function (res) { }).catch(function (error) { console.log(error); });
+            // ajax.get("", { params: {} }).then(function (res) { }).catch(function (error) { console.log(error); });
+            TrackIdparaControl({ ptzsend: '123' }).then((res) => {
+                if (res.code == 2200) {
+                    this.$message.success("发送成功");
+                } else {
+                    // this.$message.warning(res.msg);
+                }
+            });
         },
         ControlStop() {
             ptzsendControl({ ptz: "s" }).then((res) => {
@@ -1097,6 +1201,7 @@ export default {
         this.play_stream(stream_1, player_1);
         this.monitorWebsocket(); // websocket 监听事件
         let ws = wsEvent.start(this.ptzWebSocket);
+
     },
 
     created() {
@@ -1461,6 +1566,10 @@ export default {
 
 .ctrl-botton>>>.el-dialog__footer {
     background-color: #0b3d51;
+    /* margin: 0 auto; */
+    display: flex;
+    margin-top: -3%;
+    justify-content: center;
 }
 
 .ctrl-botton>>>.el-select {
@@ -1473,7 +1582,12 @@ export default {
 .dialogPrint>>>.el-table td {
     background-color: #0b3d51;
     border-bottom: 0.1px solid #00b0f0;
-    color: #fff
+    color: #fff;
+
+}
+
+.dialogPrint>>>.el-table__empty-block {
+    background-color: #0b3d51 !important;
 }
 
 .dialogPrint>>>.el-table__body tr:hover>td {
@@ -1506,6 +1620,34 @@ export default {
 .right .right-top .ctrl-botton .button:hover {
     color: #00b0f0;
     background-color: #15718e;
+}
+
+/* 更改跟踪参数 */
+/* .TrackIdparaDialog>>> .el-form{
+    margin: 0 auto;
+} */
+.TrackIdparaDialog>>>.el-form-item__label {
+    color: #fff;
+    width: 40%;
+
+}
+
+.TrackIdparaDialog>>>.el-form-item {
+    margin-bottom: 0;
+}
+
+.TrackIdparaDialog>>>.el-input {
+    width: 40%;
+    /* display: flex; */
+    margin-left: 2%;
+    color: #fff
+}
+
+.TrackIdparaBtn {
+    /* margin: 0 auto; */
+    margin-top: 3%;
+    margin-left: 40%;
+    /* transform:translate(-40%) */
 }
 
 /* 巡航线header  */
@@ -1573,7 +1715,6 @@ export default {
 }
 
 .right .right-bottom .center-box .default-list .selected-list>>>.el-table__empty-block {
-    /* height: 96%; */
     background-color: #062534;
 }
 

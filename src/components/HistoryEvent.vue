@@ -1,37 +1,51 @@
 <template>
   <div class="main">
-    <div class="param-div">
+    <!-- <div class="param-div">
       <div class="select-div">
         <span>事件：</span>
         <div class="n_input">
           <el-select v-model="event_val" class="m-2" placeholder="Select" size="small">
-            <el-option v-for="item in event_opt" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option
+              v-for="item in event_opt"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
         </div>
-
       </div>
       <div class="select-div">
         <span>通道：</span>
         <div class="n_input">
           <el-select v-model="camera_val" class="m-2" placeholder="Select" size="small">
-            <el-option v-for="item in camera_opt" :key="item.ID" :label="item.NoteName" :value="item.ThreadID" />
+            <el-option
+              v-for="item in camera_opt"
+              :key="item.ID"
+              :label="item.NoteName"
+              :value="item.ThreadID"
+            />
           </el-select>
         </div>
       </div>
       <div class="select-div">
         <span class="demonstration">日期时间：</span>
         <div class="n_input">
-          <el-date-picker v-model="datetime" type="datetimerange" :picker-options="pickerOptions"
-            value-format="yyyy-MM-dd hh:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
-            size="small">
+          <el-date-picker
+            v-model="datetime"
+            type="datetimerange"
+            :picker-options="pickerOptions"
+            value-format="yyyy-MM-dd hh:mm:ss"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            size="small"
+          >
           </el-date-picker>
         </div>
       </div>
       <el-button class="search" @click="SearchClick" size="mini">搜索</el-button>
-      <!--      <a class="download" :download="download_excel" style="display:none;"></a>-->
-      <!--      <a class="download" :download="download_excel">下载</a>-->
       <el-button class="search" @click="ExportTable" size="small">生成报表</el-button>
-    </div>
+    </div> -->
     <div class="table-div">
       <table class="table">
         <thead id="thead_1">
@@ -40,7 +54,6 @@
             <th>事件</th>
             <th>通道</th>
             <th>时间</th>
-            <!--        <th>操作</th>-->
           </tr>
         </thead>
         <tbody id="tbody_1">
@@ -53,17 +66,7 @@
         </tbody>
       </table>
     </div>
-    <div class="page-div">
-      <!-- <el-pagination
-        style="top: 5%"
-        background
-        layout="prev, pager, next"
-        :page-size="page_size"
-        :total="total"
-        @current-change="handleCurrentChange"
-      >
-      </el-pagination> -->
-    </div>
+    <div class="page-div"></div>
   </div>
 </template>
 
@@ -143,7 +146,20 @@ export default {
         },
       ],
       camera_map: new Map(),
-      table_tr: [],
+      table_tr: [
+        {
+          imgPath: 1,
+          eventType: '入侵检测',
+          channel: 2,
+          time: 3,
+        },
+        {
+          imgPath: 1,
+          eventType: '入侵检测',
+          channel: 2,
+          time: 3,
+        },
+      ],
       pickerOptions: {
         shortcuts: [
           {
@@ -189,15 +205,30 @@ export default {
     }
   },
 
-  mounted() {
-    this.event_map.set('Y00', '全部')
-    this.event_map.set('Y01', '人员离岗')
-    this.event_map.set('Y02', '打电话')
-    this.event_map.set('Y03', '抽烟')
-    this.event_map.set('Y04', '明火')
-    this.event_map.set('Y05', '烟雾')
-    this.event_map.set('Y06', '灭火器')
-    this.ws = wsEvent.start(this.wsMsgHandler)
+  async mounted() {
+    // TODO
+    let res = await API.getEvent()
+    console.log(res)
+    res = res.data.list
+    if (res) {
+      table_tr = res.map(item => {
+        return {
+          imgPath: item.image_path,
+          eventType: '入侵检测',
+          channel: item.camera_id,
+          time: item.timestamp,
+        }
+      })
+    }
+
+    // this.event_map.set('Y00', '全部')
+    // this.event_map.set('Y01', '人员离岗')
+    // this.event_map.set('Y02', '打电话')
+    // this.event_map.set('Y03', '抽烟')
+    // this.event_map.set('Y04', '明火')
+    // this.event_map.set('Y05', '烟雾')
+    // this.event_map.set('Y06', '灭火器')
+    // this.ws = wsEvent.start(this.wsMsgHandler)
 
     //
     // for (let i=0; i<10; i++){
@@ -243,7 +274,7 @@ export default {
     this.SearchClick()
   },
   methods: {
-    wsMsgHandler: function (e) {
+    wsMsgHandler: function(e) {
       // if (!e.data) {
       //   return
       // }
@@ -261,7 +292,7 @@ export default {
       }
     },
     // 提示弹窗
-    notify: function (title, msg, err_type) {
+    notify: function(title, msg, err_type) {
       Notification({ title: title, message: msg, type: err_type })
     },
     /**
@@ -339,7 +370,7 @@ export default {
         end_time: this.end_time,
       }
       this.download_is_click = 1
-      ajax.get('/api/v1/event/export', { params: param }).then(function (res) {
+      ajax.get('/api/v1/event/export', { params: param }).then(function(res) {
         let data = res.data
         if (data.code === 2200) {
           console.log(data)
@@ -468,7 +499,7 @@ export default {
   left: 5%;
   top: 9%;
 } */
-.el-button+.el-button{
+.el-button + .el-button {
   margin-left: 1%;
   height: 30%;
 }
@@ -478,7 +509,6 @@ export default {
   /* top: 15%;
   left: 3%; */
   margin-left: 2%;
-
 }
 .table-div {
   width: 96%;
