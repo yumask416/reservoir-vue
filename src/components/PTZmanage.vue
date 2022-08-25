@@ -191,7 +191,49 @@
                             </span>
                         </el-dialog>
                     </template>
-                    <div class="button" @click="printPreset()"><span>显示预置点</span></div>
+                    <!-- 显示预置点 -->
+                    <div class="button" @click="printPreset(), PresetVisible = true"><span>显示预置点</span></div>
+                    <template>
+                        <el-dialog class="dialogPrint" title="显示预置点" :visible.sync="PresetVisible" width="40%">
+                            <el-table :data="printData" class="table">
+                                <el-table-column property="token" label="预置点ID" align="center" width="80">
+                                    <template slot-scope="scope">
+                                        <el-input size="small" v-model="scope.row.token" v-if="scope.row.show"
+                                            placeholder="请输入内容" class="el-input-padding"></el-input>
+                                        <span v-if="!scope.row.show">{{ scope.row.token }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column property="name" label="预置点名称" align="center">
+                                    <template slot-scope="scope">
+                                        <el-input size="small" v-model="scope.row.name" v-if="scope.row.show"
+                                            placeholder="请输入内容" class="el-input-padding"></el-input>
+                                        <span v-if="!scope.row.show">{{ scope.row.name }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column property="ai" label="预置点算法" align="center"></el-table-column>
+                                <el-table-column label="操作" align="center">
+                                    <template slot-scope="scope">
+                                        <el-tooltip class="item" effect="dark" content="调用" placement="top">
+                                            <i class="el-icon-position" style="cursor: pointer"
+                                                @click="gotoPreset(scope.row)"></i>
+                                        </el-tooltip>
+                                        <el-tooltip class="item" effect="dark" content="保存" placement="top">
+                                            <i class="el-icon-document-copy" style="cursor: pointer"
+                                                @click="savePreset(scope.row)"></i>
+                                        </el-tooltip>
+                                        <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                            <i class="el-icon-delete-solid" style="cursor: pointer"
+                                                @click="deletePreset(scope.row)"></i>
+                                        </el-tooltip>
+                                        <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                            <i class="el-icon-s-claim" style="cursor: pointer"
+                                                @click="editPreset(scope.row)"></i>
+                                        </el-tooltip>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-dialog>
+                    </template>
                     <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
                     <!-- 添加巡航线 -->
                     <div class="button" @click="addCruiseLine(), cruiseLineVisible = true"><span>添加巡航线</span></div>
@@ -201,8 +243,16 @@
                                 @change="handleCheckAllChange">全选</el-checkbox>
                             <div style="margin: 15px 0;"></div>
                             <el-checkbox-group v-model="checkedLines" @change="handleCheckedCitiesChange">
-                                <el-checkbox v-for="city in cities" :label="city" :key="city">{{ city }}</el-checkbox>
+                                <el-checkbox v-for="(city, index) in cities" :label="city" :key="index">{{ index + 1 }}
+                                    {{
+                                            city
+                                    }}</el-checkbox>
                             </el-checkbox-group>
+                            <span slot="footer" class="dialog-footer">
+                                <el-button @click="cruiseLineVisible = false" size="small">取 消</el-button>
+                                <el-button type="primary" @click="cruiseLineVisible = false" size="small">确 定
+                                </el-button>
+                            </span>
                         </el-dialog>
                     </template>
                     <!-- 更改跟踪参数 -->
@@ -230,23 +280,23 @@
                                     :header-cell-style="tableHeaderColor" style="width: 100%" max-height="250">
                                     <el-table-column prop="token" label="ID" width="40" align="center"
                                         show-overflow-tooltip>
-                                        <template slot-scope="scope">
-                                            <el-input size="small" v-model="scope.row.token" v-show="scope.row.show"
+                                        <!-- <template slot-scope="scope">
+                                            <el-input size="small" v-model="scope.row.token" v-if="scope.row.show"
                                                 placeholder="请输入内容" class="el-input-padding"></el-input>
-                                            <span v-show="!scope.row.show">{{ scope.row.token }}</span>
-                                        </template>
+                                            <span v-if="!scope.row.show">{{ scope.row.token }}</span>
+                                        </template> -->
                                     </el-table-column>
                                     <el-table-column prop="name" label="预设点名称" width="90" align="center"
                                         show-overflow-tooltip>
-                                        <template slot-scope="scope">
+                                        <!-- <template slot-scope="scope">
                                             <el-input size="small" v-model="scope.row.name" v-show="scope.row.show"
                                                 placeholder="请输入内容" class="el-input-padding"></el-input>
                                             <span v-show="!scope.row.show">{{ scope.row.name }}</span>
-                                        </template>
+                                        </template> -->
                                     </el-table-column>
                                     <el-table-column prop="ai" label="算法" align="center" show-overflow-tooltip>
                                     </el-table-column>
-                                    <el-table-column label="操作" align="center" width="100">
+                                    <!-- <el-table-column label="操作" align="center" width="100">
                                         <template slot-scope="scope">
                                             <el-tooltip class="item" effect="dark" content="调用" placement="top">
                                                 <i class="el-icon-position" style="cursor: pointer"
@@ -265,7 +315,7 @@
                                                     @click="editPreset(scope.row)"></i>
                                             </el-tooltip>
                                         </template>
-                                    </el-table-column>
+                                    </el-table-column> -->
                                 </el-table>
                             </div>
                         </div>
@@ -282,14 +332,16 @@ import ajax from "axios";
 import { wsEvent } from '../service/ws-api'
 import {
     ptzsendControl,
+    ptzdowninitControl,
     ptzinitControl,
     ptzpresetControl,
+    ptzlineControl,
     ptzipControl,
     ptzadd,
     getlist,
     ptzdownControl,
 } from "@/service/api/camera.js";
-const cityOptions = ['上海', '北京', '广州', '深圳'];
+const LineOptions = ['巡航线2', '巡航线3', '巡航线4', '巡航线5'];
 export default {
     name: "PTZmanage",
     data() {
@@ -312,11 +364,34 @@ export default {
             reconnect_num: 0, // 重连次数
             isDestroyed: false, // 关闭或切换页面，是否断开
 
-            dialogPresetVisible: false,
+            dialogPresetVisible: false, //添加预置点
+            PresetVisible: false,  //显示预置点
+            printData: [
+                {
+                    token: '1',
+                    name: '东南',
+                    ai: '打电话'
+                },
+                {
+                    token: '2',
+                    name: '西南',
+                    ai: '明火'
+                },
+                {
+                    token: '3',
+                    name: '东北',
+                    ai: 'chouy'
+                },
+                {
+                    token: '4',
+                    name: '西北',
+                    ai: '入侵检测'
+                },
+            ],
             cruiseLineVisible: false, //添加巡航线
             checkAll: false,
             checkedLines: [],
-            cities: cityOptions,
+            cities: LineOptions,
             isIndeterminate: true,
             istruefalse: true,
             checkList: [],
@@ -399,8 +474,9 @@ export default {
         };
     },
     methods: {
-        ptzWebSocket(){
-            console.log(1111);
+        ptzWebSocket(val) {
+            // console.log('val',val.data);
+            // this.ImgInfo.imgPath = val.data
         },
         tableRowStyle({ row, rowIndex }) {
             return "padding: 0px;font-size:0.8vw;text-align: center;background-color: #15718E;border-bottom: 1px solid #3DBAF1;color: #fff;";
@@ -409,15 +485,15 @@ export default {
             return "text-align: center;background-color: #041E2B;border-bottom: 1px solid #3DBAF1;color: #fff;";
         },
         play_stream(stream_url, videoElement) {
-            if (flv.isSupported()) {
-                var flvPlayer = flv.createPlayer({
-                    type: "flv",
-                    url: stream_url,
-                });
-                flvPlayer.attachMediaElement(videoElement);
-                flvPlayer.load(); //加载
-                videoElement.play();
-            }
+            // if (flv.isSupported()) {
+            //     var flvPlayer = flv.createPlayer({
+            //         type: "flv",
+            //         url: stream_url,
+            //     });
+            //     flvPlayer.attachMediaElement(videoElement);
+            //     flvPlayer.load(); //加载
+            //     videoElement.play();
+            // }
         },
         // 增加预置点>弹窗>确认
         addPreset() {
@@ -510,7 +586,33 @@ export default {
                                         this.ptzconfig.id = res.data.id;
                                         console.log(res.data.id);
                                         console.log("摄像头添加成功");
+                                        ptzdowninitControl({
+                                            ptz_init_id_msg: this.ptzconfig.id,
+                                            ptz_init_ip_msg: this.ptzconfig.ip,
+                                            ptz_init_name_msg: this.ptzconfig.username,
+                                            ptz_init_pass_msg: this.ptzconfig.password,
+                                            ptz_init_rtsp_msg: this.ptzconfig.add_addr,
+                                        }).then((res) => {
+                                            if (res.code === 2200) {
+
+                                            } else {
+
+                                            }
+                                        });
                                     } else {
+                                        ptzdowninitControl({
+                                            ptz_init_id_msg: this.ptzconfig.id,
+                                            ptz_init_ip_msg: this.ptzconfig.ip,
+                                            ptz_init_name_msg: this.ptzconfig.username,
+                                            ptz_init_pass_msg: this.ptzconfig.password,
+                                            ptz_init_rtsp_msg: this.ptzconfig.add_addr,
+                                        }).then((res) => {
+                                            if (res.code === 2200) {
+
+                                            } else {
+
+                                            }
+                                        });
                                         this.$message.warning(res.msg);
                                     }
                                 });
@@ -518,6 +620,7 @@ export default {
                                 this.$message.warning(res.msg);
                             }
                         });
+
                 } else {
                     this.$message.warning(res.msg);
                 }
@@ -636,6 +739,7 @@ export default {
             }).then((res) => {
                 if (res.code == 2200) {
                     row.show = false;
+                    console.log('保存', row.show);
                     this.$message.success("发送成功");
                 } else {
                     this.$message.warning(res.msg);
@@ -668,8 +772,10 @@ export default {
                 }
             });
         },
+        // 操作中的编辑
         editPreset(row) {
             row.show = true;
+            console.log('编辑', row.show);
         },
         // 增加预置点
         printPreset() {
@@ -698,19 +804,24 @@ export default {
         },
         // 添加巡航线
         addCruiseLine() {
-            ajax.get("api/v1/ptz/ptzsend", {
-                params: {
-                    ptz_cruise_line_msg: "123"
+            ptzlineControl({ ptz_cruise_line_msg: '2' }).then((res) => {
+                if (res.code == 220) {
+                    console.log('成功');
                 }
-            }).then(function (res) {
-                console.log('添加巡航线', res.data);
-                console.log(response);
-            }).catch(function (error) {
-                console.log(error);
-            });
+            })
+            // ajax.get("api/v1/ptz/ptzsend", {
+            //     params: {
+            //         ptz_cruise_line_msg: "123"
+            //     }
+            // }).then(function (res) {
+            //     console.log('添加巡航线', res.data);
+            //     console.log(response);
+            // }).catch(function (error) {
+            //     console.log(error);
+            // });
         },
         handleCheckAllChange(val) {
-            this.checkedLines = val ? cityOptions : [];
+            this.checkedLines = val ? LineOptions : [];
             this.isIndeterminate = false;
         },
         handleCheckedCitiesChange(value) {
@@ -720,7 +831,7 @@ export default {
         },
         // 更改跟踪参数
         downSendTrackIdpara() {
-            ajax.get("",{params:{}}).then(function(res){}).catch(function(error){console.log(error);});
+            ajax.get("", { params: {} }).then(function (res) { }).catch(function (error) { console.log(error); });
         },
         ControlStop() {
             ptzsendControl({ ptz: "s" }).then((res) => {
@@ -1299,7 +1410,8 @@ export default {
     border-radius: 4px;
     margin-bottom: 2%;
 }
-.right .right-top .ctrl-bottons .bottons-right-two:hover{
+
+.right .right-top .ctrl-bottons .bottons-right-two:hover {
     color: #00b0f0;
     background-color: #15718e;
 }
@@ -1333,7 +1445,6 @@ export default {
 .ctrl-botton>>>.el-dialog__header {
     background-color: #041e2b;
     padding: 10px 20px 10px;
-    /* line-height: 54px; */
 }
 
 .ctrl-botton>>>.el-dialog__headerbtn {
@@ -1341,8 +1452,6 @@ export default {
 }
 
 .ctrl-botton>>>.el-dialog__title {
-    /* background-color: #06212c;
-     */
     color: #fff;
 }
 
@@ -1358,6 +1467,25 @@ export default {
     width: 100%;
 }
 
+/* 显示预置点弹窗 */
+.dialogPrint>>>.el-table tr,
+.dialogPrint>>>.el-table th,
+.dialogPrint>>>.el-table td {
+    background-color: #0b3d51;
+    border-bottom: 0.1px solid #00b0f0;
+    color: #fff
+}
+
+.dialogPrint>>>.el-table__body tr:hover>td {
+    background-color: transparent !important;
+}
+
+.dialogPrint>>>.el-input__inner {
+    background-color: #0b3d51;
+    color: #fff;
+}
+
+/* 添加巡航线弹窗 */
 .ctrl-botton>>>.el-checkbox__label {
     color: #fff;
 }
@@ -1380,8 +1508,7 @@ export default {
     background-color: #15718e;
 }
 
-
-
+/* 巡航线header  */
 .right .right-bottom {
     width: 98%;
     height: 50%;

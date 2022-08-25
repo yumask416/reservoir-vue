@@ -90,6 +90,14 @@ export async function ptzdownControl(data, url = ptzUrl.ptzsend){
   return await fetchGet(url, data);
 }
 
+export async function ptzdowninitControl(data, url = ptzUrl.ptzsendinit){
+  return await fetchGet(url, data);
+}
+
 export async function ptzadd(data, url = cameraUrl.add) {
+	return await fetchGet(url, data);
+}
+// 添加巡航线
+export async function ptzlineControl(data, url = ptzUrl.ptzsend) {
 	return await fetchGet(url, data);
 }

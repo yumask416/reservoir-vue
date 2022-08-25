@@ -72,6 +72,7 @@ export const ptz = {
   ptzpreset:'',
   ptzip:'',
   ptzsend:'',
+  ptzsendinit:'',
 }
 export const ptzUrl = new Proxy(ptz,{
   get(target,key) {
