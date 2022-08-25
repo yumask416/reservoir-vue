@@ -23,7 +23,7 @@
                         <img src="../../static/images/camera_default.png" alt="" />
                     </div>
                     <div class="img-div">
-                        <img :src="ImgInfo.imgPath" class="image-img" alt="" width="100%" height="100%">
+                        <img :src="ImgInfo.imgPath" class="image-img" alt="" width="100%" height="100%" />
                     </div>
                     <!-- <div class="warn-msg" v-show="!isBigImg">
                         <div class="msg-text" style="color: red">
@@ -57,17 +57,8 @@
                     <h3>事件列表</h3>
                 </div>
                 <div class="event-img-list">
-                    <div class="img-box">
-                        <img :src="WarningImgInfo.warningimgpath1" alt="" />
-                    </div>
-                    <div class="img-box">
-                        <img :src="WarningImgInfo.warningimgpath2" alt="" />
-                    </div>
-                    <div class="img-box">
-                        <img :src="WarningImgInfo.warningimgpath3" alt="" />
-                    </div>
-                    <div class="img-box">
-                        <img :src="WarningImgInfo.warningimgpath4" alt="" />
+                    <div class="img-box" v-for="item in warnArr">
+                        <img :src="item.imgpath" alt="" />
                     </div>
                 </div>
             </div>
@@ -148,7 +139,6 @@
                                 <div class="bottons-right-two" @click="ListCamera()">
                                     <span>删除球机</span>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -168,7 +158,9 @@
                 </div>
                 <div class="ctrl-botton">
                     <!-- 增加预置点 -->
-                    <div class="button" @click="printPreset(), dialogPresetVisible = true"><span>增加预置点</span></div>
+                    <div class="button" @click="printPreset(), (dialogPresetVisible = true)">
+                        <span>增加预置点</span>
+                    </div>
                     <template>
                         <el-dialog class="dialogPreset" @close="closeDialog" title="增加预置点"
                             :visible.sync="dialogPresetVisible" width="40%">
@@ -189,14 +181,16 @@
                             </div>
                             <span slot="footer" class="dialog-footer">
                                 <el-button @click="dialogPresetVisible = false" size="small">取 消</el-button>
-                                <el-button type="primary" @click="addPreset(), dialogPresetVisible = false"
+                                <el-button type="primary" @click="addPreset(), (dialogPresetVisible = false)"
                                     size="small">确 定
                                 </el-button>
                             </span>
                         </el-dialog>
                     </template>
                     <!-- 显示预置点 -->
-                    <div class="button" @click="printPreset(), PresetVisible = true"><span>显示预置点</span></div>
+                    <div class="button" @click="printPreset(), (PresetVisible = true)">
+                        <span>显示预置点</span>
+                    </div>
                     <template>
                         <el-dialog class="dialogPrint" title="显示预置点" :visible.sync="PresetVisible" width="40%">
                             <el-table :data="presetinfotableData2" class="table">
@@ -241,7 +235,9 @@
                     <!-- 更改跟踪方式 -->
                     <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
                     <!-- 添加巡航线 -->
-                    <div class="button" @click="printPreset(), cruiseLineVisible = true"><span>添加巡航线</span></div>
+                    <div class="button" @click="printPreset(), (cruiseLineVisible = true)">
+                        <span>添加巡航线</span>
+                    </div>
                     <template>
                         <el-dialog :visible.sync="cruiseLineVisible" title="添加巡航线" width="50%" @close="closeDialog">
                             <!-- <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
@@ -250,22 +246,18 @@
                             <el-checkbox-group v-model="checkedLines" @change="handleCheckedLinesChange">
                                 <el-checkbox v-for="item in presetinfotableData2" :label="item" :key="item.token">{{
                                         item.token
-                                }}
-                                    {{
-                                            item.name
-                                    }}</el-checkbox>
+                                }} {{ item.name }}</el-checkbox>
                             </el-checkbox-group>
                             <span slot="footer" class="dialog-footer">
                                 <el-button @click="cruiseLineVisible = false" size="small">取 消</el-button>
-                                <el-button type="primary" @click="addCruiseLine(), cruiseLineVisible = false"
+                                <el-button type="primary" @click="addCruiseLine(), (cruiseLineVisible = false)"
                                     size="small">确 定
                                 </el-button>
                             </span>
                         </el-dialog>
                     </template>
                     <!-- 更改跟踪参数 -->
-                    <div class="button" @click="trackIdparaVisible = true"><span>更改跟踪参数</span>
-                    </div>
+                    <div class="button" @click="trackIdparaVisible = true"><span>更改跟踪参数</span></div>
                     <template>
                         <el-dialog class="TrackIdparaDialog" :visible.sync="trackIdparaVisible" title="更改跟踪参数"
                             width="50%">
@@ -400,10 +392,9 @@
         </div>
     </div>
 </template>
-<script >
-import $ from "jquery";
-import flv from "flv.js";
-import ajax from "axios";
+<script>
+import $ from 'jquery'
+import flv from 'flv.js'
 import { wsEvent } from '../service/ws-api'
 import {
     ptzsendControl,
@@ -416,18 +407,21 @@ import {
     ptzadd,
     getlist,
     ptzdownControl,
-} from "@/service/api/camera.js";
-const LineOptions = ['巡航线2', '巡航线3', '巡航线4', '巡航线5'];
+} from '@/service/api/camera.js'
+const LineOptions = ['巡航线2', '巡航线3', '巡航线4', '巡航线5']
 export default {
-    name: "PTZmanage",
+    name: 'PTZmanage',
     data() {
         return {
-            ImgInfo: { imgPath: "" },
+            lockTimeout: null,
+            isLocked: false,
+            warnArr: [],
+            ImgInfo: { imgPath: '' },
             WarningImgInfo: {
-                warningimgpath1: "",
-                warningimgpath2: "",
-                warningimgpath3: "",
-                warningimgpath4: ""
+                warningimgpath1: '',
+                warningimgpath2: '',
+                warningimgpath3: '',
+                warningimgpath4: '',
             },
             CruiseLine: '巡航线',
             WarningImgIndex: [false, false, false, false],
@@ -441,7 +435,7 @@ export default {
             isDestroyed: false, // 关闭或切换页面，是否断开
 
             dialogPresetVisible: false, //添加预置点
-            PresetVisible: false,  //显示预置点
+            PresetVisible: false, //显示预置点
             printData: [
                 // {
                 //     token: '',
@@ -474,80 +468,104 @@ export default {
                 moveSpeed: 0.1,
                 focalSpeed: 0.1,
                 moveDelayTime: 100000,
-                focalDelayTime: 10000
+                focalDelayTime: 10000,
             },
 
             ptzconfig: {
                 id: 0,
-                ip: "10.10.10.219",
-                url: "0.0.0.0:0",
-                username: "admin",
-                password: "AGvay123456",
-                add_name: "ptz1",
-                add_addr: "",
+                ip: '10.10.10.219',
+                url: '0.0.0.0:0',
+                username: 'admin',
+                password: 'AGvay123456',
+                add_name: 'ptz1',
+                add_addr: '',
             },
-            autotrackid: "",
-            choosetrackoptions: [{
-                value: '1',
-                label: 'ID最小'
-            }, {
-                value: '2',
-                label: 'ID最大'
-            }, {
-                value: '3',
-                label: '锁定ID'
-            }, {
-                value: '4',
-                label: '最大目标'
-            }, {
-                value: '5',
-                label: '最小目标'
-            }],
+            autotrackid: '',
+            choosetrackoptions: [
+                {
+                    value: '1',
+                    label: 'ID最小',
+                },
+                {
+                    value: '2',
+                    label: 'ID最大',
+                },
+                {
+                    value: '3',
+                    label: '锁定ID',
+                },
+                // {
+                //   value: '4',
+                //   label: '最大目标',
+                // },
+                // {
+                //   value: '5',
+                //   label: '最小目标',
+                // },
+            ],
             choosetrackmodule: '',
             AIalgorithm: [
                 {
                     value: 'A01',
-                    label: "入侵检测-人员",
-                }],
+                    label: '入侵检测-人员',
+                },
+            ],
             area: {
-                token: "1",
-                presetalgorithm: { "22": [0.1, 0.1, 0.1, 0.1], "23": [0.2, 0.2, 0.2, 0.2] },
+                token: '1',
+                presetalgorithm: { '22': [0.1, 0.1, 0.1, 0.1], '23': [0.2, 0.2, 0.2, 0.2] },
             },
-            autotrackkey: ["star", "end"],
+            autotrackkey: ['star', 'end'],
             buttons: [
-                { iclass: "el-icon-top-left", title: "top-left" },
-                { iclass: "el-icon-top", title: "top" },
-                { iclass: "el-icon-top-right", title: "top-right" },
+                { iclass: 'el-icon-top-left', title: 'top-left' },
+                { iclass: 'el-icon-top', title: 'top' },
+                { iclass: 'el-icon-top-right', title: 'top-right' },
             ],
             isBigImg: false,
-            preset_token: "",
-            preset_name: "",
+            preset_token: '',
+            preset_name: '',
             preset_ai: ['入侵检测-人员'],
             presetinfotableData: [
                 // { token: "1", name: "东南角预设点", algorithm: ["无"], show: false },
             ],
             presetinfotableData2: [],
             tableData: [
-                { token: "1", name: "东南角预设点", algorithm: ["入侵检测-人员"], show: false },
-                { token: "2", name: "西南角预设点", algorithm: ["入侵检测-人员"], show: false },
-                { token: "3", name: "东南角预设点", algorithm: ["入侵检测-人员"], show: false },
-                { token: "4", name: "西南角预设点", algorithm: ["入侵检测-人员"], show: false },
+                { token: '1', name: '东南角预设点', algorithm: ['入侵检测-人员'], show: false },
+                { token: '2', name: '西南角预设点', algorithm: ['入侵检测-人员'], show: false },
+                { token: '3', name: '东南角预设点', algorithm: ['入侵检测-人员'], show: false },
+                { token: '4', name: '西南角预设点', algorithm: ['入侵检测-人员'], show: false },
             ],
-        };
+        }
     },
     methods: {
         ptzWebSocket(val) {
-            let data=JSON.parse(val.data)
-            // console.log('val',data);
-            
+              let data = JSON.parse(val.data)
+            //   console.log('val', data)
+
             // console.log('val',val.data.image_path);
-            this.ImgInfo.imgPath = 'http://10.10.10.226:10225/'+data.image_path
+            this.ImgInfo.imgPath = 'http://10.10.10.226:10225/' + data.image_path
+
+            if (data.is_warning) {
+                if (!this.isLocked) {
+                    this.isLocked = true
+                    this.warnArr.push({
+                        imgpath: 'http://10.10.10.226:10225/' + data.image_path,
+                        time: data['timestamp'],
+                        eventtype: data['event_type'],
+                    })
+                    if (this.warnArr.length == 5) {
+                        this.warnArr.shift()
+                    }
+                    this.lockTimeout = setTimeout(() => {
+                        this.isLocked = false
+                    }, 50)
+                }
+            }
         },
         tableRowStyle({ row, rowIndex }) {
-            return "padding: 0px;font-size:0.8vw;text-align: center;background-color: #15718E;border-bottom: 1px solid #3DBAF1;color: #fff;";
+            return 'padding: 0px;font-size:0.8vw;text-align: center;background-color: #15718E;border-bottom: 1px solid #3DBAF1;color: #fff;'
         },
         tableHeaderColor({ row, column, rowIndex, columnIndex }) {
-            return "text-align: center;background-color: #041E2B;border-bottom: 1px solid #3DBAF1;color: #fff;";
+            return 'text-align: center;background-color: #041E2B;border-bottom: 1px solid #3DBAF1;color: #fff;'
         },
         play_stream(stream_url, videoElement) {
             // if (flv.isSupported()) {
@@ -563,28 +581,28 @@ export default {
         // 增加预置点>弹窗>确认
         addPreset() {
             ptzpresetControl({
-                ptzpreset: "setpreset",
+                ptzpreset: 'setpreset',
                 ptzpresetname: this.preset_name,
                 ptzpresettoken: this.preset_token,
-            }).then((res) => {
+            }).then(res => {
                 if (res.code == 2200) {
                     let presetinfoDate = {
                         token: this.preset_token,
                         name: this.preset_name,
                         ai: this.preset_ai,
-                    };
+                    }
                     // this.presetinfotableData.push(presetinfoDate);
-                    this.$message.success("添加成功");
+                    this.$message.success('添加成功')
                     this.printPreset()
                 } else {
-                    this.$message.warning(res.msg);
+                    this.$message.warning(res.msg)
                 }
-            });
+            })
             // let preset_save_key = false;
             // for (let i = 0; i <= this.presetinfotableData2.length; i++) {
             //   if (this.preset_token === this.presetinfotableData2[i].token) {
             //     preset_save_key = true;
-            //     break;          
+            //     break;
             //   }
             // };
             // if (preset_save_key) {
@@ -604,7 +622,7 @@ export default {
             //     } else {
             //       this.$message.warning(res.msg);
             //     }
-            //   });      
+            //   });
             // } else {
             //   ptzpresetControl({
             //     ptzpreset: "setpreset",
@@ -629,68 +647,88 @@ export default {
         GetUrlPTZ() {
             ptzipControl({
                 ptzip: this.ptzconfig.ip,
-            }).then((res) => {
+            }).then(res => {
                 if (res.code === 2200) {
-                    (this.ptzconfig.url = res.data),
+                    ; (this.ptzconfig.url = res.data),
                         // console.log(res.data),
-                        console.log("获取url成功"),
+                        console.log('获取url成功'),
                         ptzinitControl({
                             ptzurl: this.ptzconfig.url,
                             ptzusername: this.ptzconfig.username,
                             ptzpassword: this.ptzconfig.password,
-                        }).then((res) => {
+                        }).then(res => {
                             if (res.code === 2200) {
-                                (this.ptzconfig.add_addr = res.data),
-                                    console.log("初始化成功"),
-                                    console.log("获取流成功");
+                                ; (this.ptzconfig.add_addr = res.data),
+                                    console.log('初始化成功'),
+                                    console.log('获取流成功')
                                 // console.log(`rtsp://${this.ptzconfig.username}:${this.ptzconfig.password}@${this.ptzconfig.ip}`);
                                 ptzadd({
                                     name: this.ptzconfig.add_name,
                                     addr: this.ptzconfig.add_addr,
-                                }).then((res) => {
+                                }).then(res => {
                                     if (res.code === 2200) {
-                                        this.ptzconfig.id = res.data.id;
+                                        this.ptzconfig.id = res.data.id
                                         // console.log(res.data.id);
-                                        console.log("摄像头添加成功");
+                                        console.log('摄像头添加成功')
+                                        getlist({}).then((res) => {
+                                            if (res.code === 2200) {
+                                                for (var i = 0; i < res.data.list.length; i++) {
+                                                    if (this.ptzconfig.ip == res.data.list[i].ip) {
+                                                        this.ptzconfig.id = res.data.list[i].id
+                                                    }
+                                                }
+                                            } else {
+                                                console.log('失败', res)
+                                            }
+                                        })
                                         ptzdowninitControl({
                                             ptz_init_id_msg: this.ptzconfig.id,
                                             ptz_init_ip_msg: this.ptzconfig.ip,
                                             ptz_init_name_msg: this.ptzconfig.username,
                                             ptz_init_pass_msg: this.ptzconfig.password,
                                             ptz_init_rtsp_msg: this.ptzconfig.add_addr,
-                                        }).then((res) => {
+                                        }).then(res => {
                                             if (res.code === 2200) {
 
                                             } else {
-
                                             }
-                                        });
+                                        })
                                     } else {
+                                        getlist({}).then((res) => {
+                                            console.log(123156454)
+                                            if (res.code === 2200) {
+                                                for (var i = 0; i < res.data.list.length; i++) {
+                                                    if (this.ptzconfig.ip == res.data.list[i].ip) {
+                                                        this.ptzconfig.id = res.data.list[i].id
+                                                    }
+                                                }
+                                            } else {
+                                                console.log('失败', res)
+                                            }
+                                        })
                                         ptzdowninitControl({
                                             ptz_init_id_msg: this.ptzconfig.id,
                                             ptz_init_ip_msg: this.ptzconfig.ip,
                                             ptz_init_name_msg: this.ptzconfig.username,
                                             ptz_init_pass_msg: this.ptzconfig.password,
-                                            ptz_init_rtsp_msg: this.ptzconfig.add_addr
-                                        }).then((res) => {
+                                            ptz_init_rtsp_msg: this.ptzconfig.add_addr,
+                                        }).then(res => {
                                             if (res.code === 2200) {
 
                                             } else {
-
                                             }
-                                        });
-                                        this.$message.warning(res.msg);
+                                        })
+                                        this.$message.warning(res.msg)
                                     }
-                                });
+                                })
                             } else {
-                                this.$message.warning(res.msg);
+                                this.$message.warning(res.msg)
                             }
-                        });
-
+                        })
                 } else {
-                    this.$message.warning(res.msg);
+                    this.$message.warning(res.msg)
                 }
-            });
+            })
         },
 
         // InitAndGetRtspPTZ() {
@@ -725,30 +763,30 @@ export default {
         // },
         // 删除球机
         ListCamera() {
-            getlist({}).then((res) => {
+            getlist({}).then(res => {
                 if (res.code === 2200) {
-                    (this.ptzconfig.id = res.data.list[0].id),
+                    ; (this.ptzconfig.id = res.data.list[0].id),
                         (this.ptzconfig.ip = res.data.list[0].ip),
                         (this.ptzconfig.add_name = res.data.list[0].name),
                         (this.ptzconfig.add_addr = res.data.list[0].main_stream),
-                        console.log(res.data.list[0]);
+                        console.log(res.data.list[0])
                     // $(".config-div").css("display", "none");
                     // _this.Ready();
                 } else {
-                    console.log("失败", res);
+                    console.log('失败', res)
                 }
-            });
+            })
         },
         // 操作中的保存
         downsendPreset() {
             ptzdownControl({ ptz_area_msg: JSON.stringify(this.area) }).then(res => {
-                let data = res.data;
+                let data = res.data
                 if (data.code == 2200) {
-                    console.log("成功");
+                    console.log('成功')
                 } else {
-                    console.log("失败");
+                    console.log('失败')
                 }
-            });
+            })
             // ajax.get("/api/v1/camera/ai", { params: param }).then(function (res) {
             //   let data = res.data;
             //   if (data.code === 2200) {
@@ -764,112 +802,115 @@ export default {
         // 目标跟踪开关
         downsendInfo() {
             if (this.istruefalse) {
-                ptzdownControl({ ptz_send_msg: "star" }).then(res => {
-                    this.istruefalse = false;
+                ptzdownControl({ ptz_send_msg: 'star' }).then(res => {
+                    this.istruefalse = false
                     if (res.code == 2200) {
-                        console.log("成功");
-                        this.$message.success("目标跟踪已开启");
+                        console.log('成功')
+                        this.$message.success('目标跟踪已开启')
                     } else {
-                        console.log("失败");
+                        console.log('失败')
                     }
                 })
             } else {
-                ptzdownControl({ ptz_send_msg: "end" }).then(res => {
-                    this.istruefalse = true;
+                ptzdownControl({ ptz_send_msg: 'end' }).then(res => {
+                    this.istruefalse = true
                     // let data = res.data;
                     if (res.code == 2200) {
-                        console.log("成功");
-                        this.$message.info("目标跟踪已关闭");
+                        console.log('成功')
+                        this.$message.info('目标跟踪已关闭')
                     } else {
-                        console.log("失败");
+                        console.log('失败')
                     }
                 })
             }
         },
         // 更改跟踪方式
         downSendTrackIdInfo() {
-            ptzdownControl({ ptz_track_id_msg: this.autotrackid, ptz_track_mode_msg: this.choosetrackmodule }).then(res => {
+            ptzdownControl({
+                ptz_track_id_msg: this.autotrackid,
+                ptz_track_mode_msg: this.choosetrackmodule,
+            }).then(res => {
                 // let data = res.data;
                 if (res.code == 2200) {
-                    console.log("成功");
-                    this.$message.success("跟踪方式已更改");
+                    console.log('成功')
+                    this.$message.success('跟踪方式已更改')
                 } else {
-                    console.log("失败");
+                    console.log('失败')
                 }
             })
         },
         // 更改跟踪参数
         onSubmit() {
-            console.log('submit!');
+            console.log('submit!')
         },
         // 操作中的保存
         savePreset(row) {
             ptzpresetControl({
-                ptzpreset: "setpreset",
+                ptzpreset: 'setpreset',
                 ptzpresetname: row.name,
                 ptzpresettoken: row.token,
-            }).then((res) => {
+            }).then(res => {
                 if (res.code == 2200) {
-                    row.show = false;
-                    console.log('保存', row.show);
-                    this.$message.success("发送成功");
+                    row.show = false
+                    console.log('保存', row.show)
+                    this.$message.success('发送成功')
                 } else {
-                    this.$message.warning(res.msg);
+                    this.$message.warning(res.msg)
                 }
-            });
+            })
         },
         // 操作中的删除
         deletePreset(row) {
             this.$confirm('是否确认删除此预置点?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '删除成功!'
-                });
-                ptzpresetControl({
-                    ptzpreset: "deletepreset",
-                    ptzpresettoken: row.token,
-                }).then((res) => {
-                    if (res.code == 2200) {
-                        // this.$message.success("发送成功");
-                        this.printPreset()
-
-                    } else {
-                        this.$message.warning(res.msg);
-                    }
-                });
-            }).catch(() => {
-                // this.$message({
-                //     type: 'info',
-                //     message: '已取消删除'
-                // });
-            });
-
+                type: 'warning',
+            })
+                .then(() => {
+                    this.$message({
+                        type: 'success',
+                        message: '删除成功!',
+                    })
+                    ptzpresetControl({
+                        ptzpreset: 'deletepreset',
+                        ptzpresettoken: row.token,
+                    }).then(res => {
+                        if (res.code == 2200) {
+                            // this.$message.success("发送成功");
+                            this.printPreset()
+                        } else {
+                            this.$message.warning(res.msg)
+                        }
+                    })
+                })
+                .catch(() => {
+                    // this.$message({
+                    //     type: 'info',
+                    //     message: '已取消删除'
+                    // });
+                })
         },
         // 操作中的调用
         gotoPreset(row) {
             ptzpresetControl({
-                ptzpreset: "gotopreset",
+                ptzpreset: 'gotopreset',
                 ptzpresettoken: row.token,
-            }).then((res) => {
+            }).then(res => {
                 if (res.code == 2200) {
-                    this.$message.success("发送成功");
+                    this.$message.success('发送成功')
                 } else {
-                    this.$message.warning(res.msg);
+                    this.$message.warning(res.msg)
                 }
-            });
+            })
         },
         // 操作中的编辑
         editPreset(row) {
-            row.show = true;
-            console.log('编辑', row.show);
+            row.show = true
+            console.log('编辑', row.show)
         },
         // 增加预置点
         printPreset() {
-            ptzpresetControl({ ptzpreset: "getpreset" }).then((res) => {
+            ptzpresetControl({ ptzpreset: 'getpreset' }).then(res => {
                 if (res.code == 2200) {
                     console.log('res.data', res.data)
                     this.printData = res.data
@@ -877,20 +918,20 @@ export default {
                     // for(var i = 0;i < this.printData.length;i++){
 
                     // }
-                    this.presetinfotableData2.length = 0;
+                    this.presetinfotableData2.length = 0
                     for (let i = 0; i <= res.data.length; i++) {
                         let presetDate = {
-                            token: res.data[i]["-token"],
+                            token: res.data[i]['-token'],
                             name: res.data[i].Name,
-                            ai: "入侵检测-人员",
-                        };
-                        this.presetinfotableData2.push(presetDate);
+                            ai: '入侵检测-人员',
+                        }
+                        this.presetinfotableData2.push(presetDate)
                         // console.log('this.presetinfotableData2',this.presetinfotableData2);
                     }
                 } else {
-                    this.$message.warning(res.msg);
+                    this.$message.warning(res.msg)
                 }
-            });
+            })
             if (this.presetinfotableData.length === 0) {
                 // this.$message.warning("11111111111111");
                 // console.log(7777)
@@ -902,10 +943,10 @@ export default {
         //关闭弹窗
         closeDialog() {
             // console.log(123456)
-            this.preset_token = "",
-                this.preset_name = "",
-                this.preset_ai = [],
-                this.checkedLines = []
+            ; (this.preset_token = ''),
+                (this.preset_name = ''),
+                (this.preset_ai = []),
+                (this.checkedLines = [])
             this.isIndeterminate = false
         },
         // 添加巡航线
@@ -916,320 +957,313 @@ export default {
                 this.presetinfotableData.push(this.checkedLines[i])
                 this.tokens.push(this.checkedLines[i].token)
                 this.token = this.tokens.join(',')
-                console.log('this.presetinfotableData', this.presetinfotableData);
+                console.log('this.presetinfotableData', this.presetinfotableData)
             }
-            ptzlineControl({ ptz_cruise_line_msg: this.token }).then((res) => {
+            ptzlineControl({ ptz_cruise_line_msg: this.token }).then(res => {
                 if (res.code == 2200) {
-                    console.log('成功');
+                    console.log('成功')
                 }
             })
         },
         handleCheckAllChange(val) {
-            console.log('全选', val);
-            this.checkedLines = val ? this.presetinfotableData2 : [];
+            console.log('全选', val)
+            this.checkedLines = val ? this.presetinfotableData2 : []
             console.log('this.checkedLines', this.checkedLines)
-            this.isIndeterminate = false;
+            this.isIndeterminate = false
         },
         handleCheckedLinesChange(value) {
-            console.log('value', value);
-            let checkedCount = value.length;
-            this.checkAll = checkedCount === this.presetinfotableData2.length;
-            this.isIndeterminate = checkedCount > 0 && checkedCount < this.presetinfotableData2.length;
+            console.log('value', value)
+            let checkedCount = value.length
+            this.checkAll = checkedCount === this.presetinfotableData2.length
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.presetinfotableData2.length
         },
         // 更改跟踪参数
         downSendTrackIdpara() {
             // ajax.get("", { params: {} }).then(function (res) { }).catch(function (error) { console.log(error); });
-            TrackIdparaControl({ ptzsend: '123' }).then((res) => {
+            TrackIdparaControl({ ptzsend: '123' }).then(res => {
                 if (res.code == 2200) {
-                    this.$message.success("发送成功");
+                    this.$message.success('发送成功')
                 } else {
                     // this.$message.warning(res.msg);
                 }
-            });
+            })
         },
         ControlStop() {
-            ptzsendControl({ ptz: "s" }).then((res) => {
+            ptzsendControl({ ptz: 's' }).then(res => {
                 if (res.code == 2200) {
-                    this.$message.success("发送成功");
+                    this.$message.success('发送成功')
                 } else {
-                    this.$message.warning(res.msg);
+                    this.$message.warning(res.msg)
                 }
-            });
+            })
         },
 
         ControlPTZ(key) {
             switch (key) {
-                case "a":
-                    ptzsendControl({ ptz: "a" }).then((res) => {
+                case 'a':
+                    ptzsendControl({ ptz: 'a' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "d":
-                    ptzsendControl({ ptz: "d" }).then((res) => {
+                    })
+                    break
+                case 'd':
+                    ptzsendControl({ ptz: 'd' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "q":
-                    ptzsendControl({ ptz: "q" }).then((res) => {
+                    })
+                    break
+                case 'q':
+                    ptzsendControl({ ptz: 'q' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "w":
-                    ptzsendControl({ ptz: "w" }).then((res) => {
+                    })
+                    break
+                case 'w':
+                    ptzsendControl({ ptz: 'w' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "e":
-                    ptzsendControl({ ptz: "e" }).then((res) => {
+                    })
+                    break
+                case 'e':
+                    ptzsendControl({ ptz: 'e' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "z":
-                    ptzsendControl({ ptz: "z" }).then((res) => {
+                    })
+                    break
+                case 'z':
+                    ptzsendControl({ ptz: 'z' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "x":
-                    ptzsendControl({ ptz: "x" }).then((res) => {
+                    })
+                    break
+                case 'x':
+                    ptzsendControl({ ptz: 'x' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "c":
-                    ptzsendControl({ ptz: "c" }).then((res) => {
+                    })
+                    break
+                case 'c':
+                    ptzsendControl({ ptz: 'c' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "1":
-                    ptzsendControl({ ptz: "1" }).then((res) => {
+                    })
+                    break
+                case '1':
+                    ptzsendControl({ ptz: '1' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
-                case "2":
-                    ptzsendControl({ ptz: "2" }).then((res) => {
+                    })
+                    break
+                case '2':
+                    ptzsendControl({ ptz: '2' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success("发送成功");
+                            this.$message.success('发送成功')
                         } else {
-                            this.$message.warning(res.msg);
+                            this.$message.warning(res.msg)
                         }
-                    });
-                    break;
+                    })
+                    break
             }
         },
 
         notify: function (title, msg, err_type) {
-            new Notification({ title: title, message: msg, type: err_type });
+            new Notification({ title: title, message: msg, type: err_type })
         },
         initWebSocket() {
             try {
-                if ("WebSocket" in window) {
+                if ('WebSocket' in window) {
                     //建立连接
                     //初始化weosocket
-                    let wsuri = "ws://" + window.location.host + "/api/v1/event/ws";
+                    let wsuri = 'ws://' + window.location.host + '/api/v1/event/ws'
                     // let wsuri = "ws://10.10.10.119:10225/api/v1/event/ws";
                     //建立连接
-                    this.ws = new WebSocket(wsuri);
+                    this.ws = new WebSocket(wsuri)
                 }
-                this.monitorWebsocket();
+                this.monitorWebsocket()
             } catch (e) {
-                this.wsReconnect();
+                this.wsReconnect()
             }
         },
         wsReconnect() {
             //websocket重新连接
-            var that = this;
+            var that = this
             if (that.lockReconnect || that.isDestroyed) {
-                return;
+                return
             }
-            that.lockReconnect = true;
+            that.lockReconnect = true
             //没连接上会一直重连，设置延迟避免请求过多
-            that.timeoutnum && clearTimeout(that.timeoutnum);
+            that.timeoutnum && clearTimeout(that.timeoutnum)
             that.timeoutnum = setTimeout(function () {
                 //新连接
-                that.initWebSocket();
-                that.lockReconnect = false;
-            }, 5000);
+                that.initWebSocket()
+                that.lockReconnect = false
+            }, 5000)
         },
         heartBeatReset() {
             //重置心跳
-            var that = this;
+            var that = this
             //清除时间
-            clearTimeout(that.timeoutObj);
-            clearTimeout(that.serverTimeoutObj);
+            clearTimeout(that.timeoutObj)
+            clearTimeout(that.serverTimeoutObj)
             //重启心跳
-            that.heartBeatStart();
+            that.heartBeatStart()
         },
         heartBeatStart() {
             //开启心跳
-            var self = this;
-            self.timeoutObj && clearTimeout(self.timeoutObj);
-            self.serverTimeoutObj && clearTimeout(self.serverTimeoutObj);
+            var self = this
+            self.timeoutObj && clearTimeout(self.timeoutObj)
+            self.serverTimeoutObj && clearTimeout(self.serverTimeoutObj)
             self.timeoutObj = setTimeout(function () {
                 //这里发送一个心跳，后端收到后，返回一个心跳消息
                 if (self.ws.readyState == 1) {
                     //如果连接正常
-                    self.ws.send("ping");
+                    self.ws.send('ping')
                 } else {
                     //否则重连
-                    console.log("readyState is ", self.ws.readyState);
-                    self.wsReconnect();
+                    console.log('readyState is ', self.ws.readyState)
+                    self.wsReconnect()
                 }
                 self.serverTimeoutObj = setTimeout(function () {
                     //超时关闭
-                    console.log("超时关闭!");
-                    self.ws.close();
-                }, 10000);
-            }, 5000);
+                    console.log('超时关闭!')
+                    self.ws.close()
+                }, 10000)
+            }, 5000)
         },
         monitorWebsocket() {
-            var _this = this;
+            var _this = this
             this.ws.onopen = function (event) {
-                console.log("连接" + event);
-                _this.heartBeatStart(); // 开启心跳
-            };
+                console.log('连接' + event)
+                _this.heartBeatStart() // 开启心跳
+            }
             this.ws.onmessage = function (event) {
-                if (event.data === "pong") {
-                    console.log(event.data);
+                if (event.data === 'pong') {
+                    console.log(event.data)
                     //收到服务器信息，心跳重置
-                    _this.heartBeatReset();
-                    return;
+                    _this.heartBeatReset()
+                    return
                 }
-                let data = JSON.parse(event.data);
-                if (data == "") {
-                    return;
+                let data = JSON.parse(event.data)
+                if (data == '') {
+                    return
                 }
-                _this.heartBeatReset();
-                if (data["is_warning"]) {
+                _this.heartBeatReset()
+                if (data['is_warning']) {
                     if (_this.WarningImgIndex[2]) {
-                        _this.WarningImgInfo.warningimgpath4 = _this.WarningImgInfo.warningimgpath3;
+                        _this.WarningImgInfo.warningimgpath4 = _this.WarningImgInfo.warningimgpath3
                     }
                     if (_this.WarningImgIndex[1]) {
-                        _this.WarningImgInfo.warningimgpath3 = _this.WarningImgInfo.warningimgpath2;
-                        _this.WarningImgIndex[2] = true;
+                        _this.WarningImgInfo.warningimgpath3 = _this.WarningImgInfo.warningimgpath2
+                        _this.WarningImgIndex[2] = true
                     }
                     if (_this.WarningImgIndex[0]) {
-                        _this.WarningImgInfo.warningimgpath2 = _this.WarningImgInfo.warningimgpath1;
-                        _this.WarningImgIndex[1] = true;
+                        _this.WarningImgInfo.warningimgpath2 = _this.WarningImgInfo.warningimgpath1
+                        _this.WarningImgIndex[1] = true
                     }
-                    _this.WarningImgInfo.warningimgpath1 = "/" + data["image_path"];
-                    _this.WarningImgIndex[0] = true;
+                    _this.WarningImgInfo.warningimgpath1 = '/' + data['image_path']
+                    _this.WarningImgIndex[0] = true
                 } else {
-                    _this.ImgInfo.imgPath = "/" + data["image_path"];
+                    _this.ImgInfo.imgPath = '/' + data['image_path']
                 }
 
-                console.log(data["img_coordinate"]);
-            };
+                console.log(data['img_coordinate'])
+            }
             this.ws.onerror = function (event) {
                 // alert(event.data);
-                console.log("错误：" + event);
-                _this.wsReconnect();
+                console.log('错误：' + event)
+                _this.wsReconnect()
                 // print("错误："+event.data)
-            };
+            }
             this.ws.onclose = function (event) {
                 //连接关闭事件
                 //提示关闭
-                console.log("isDestroyed: ", _this.isDestroyed);
+                console.log('isDestroyed: ', _this.isDestroyed)
                 if (!_this.isDestroyed) {
-                    console.log(
-                        "连接已关闭:",
-                        event.code + " " + event.reason + " " + event.wasClean
-                    );
-                    _this.reconnect_num += 1;
-                    var err_str =
-                        "网络服务差, 正在执行第" +
-                        _this.reconnect_num.toString() +
-                        "次重连！";
-                    _this.notify("错误", err_str, "error");
+                    console.log('连接已关闭:', event.code + ' ' + event.reason + ' ' + event.wasClean)
+                    _this.reconnect_num += 1
+                    var err_str = '网络服务差, 正在执行第' + _this.reconnect_num.toString() + '次重连！'
+                    _this.notify('错误', err_str, 'error')
                 }
                 //重连
-                _this.wsReconnect();
-            };
+                _this.wsReconnect()
+            }
         },
 
         LoopTS(obj, key) {
-            let _this = this;
+            let _this = this
             for (let j = 0; j < 3; j++) {
                 for (let i = 1; i <= 10; i++) {
                     setTimeout(function () {
                         // $(obj).css({"box-shadow": _this.ColorList.get(key)+" 0px 0px "+i+"px "+i+"px inset"})
                         $(obj).css({
-                            "box-shadow": "red 0px 0px " + i + "px " + i + "px inset",
-                        });
-                    }, i * 15);
+                            'box-shadow': 'red 0px 0px ' + i + 'px ' + i + 'px inset',
+                        })
+                    }, i * 15)
                 }
-                let num = 1;
+                let num = 1
                 for (let i = 9; i >= 0; i--) {
                     setTimeout(function () {
                         // $(obj).css({"box-shadow": _this.ColorList.get(key)+" 0px 0px "+i+"px "+i+"px inset"})
                         $(obj).css({
-                            "box-shadow": "red 0px 0px " + i + "px " + i + "px inset",
-                        });
-                    }, num * 15 + 150);
-                    num += 1;
+                            'box-shadow': 'red 0px 0px ' + i + 'px ' + i + 'px inset',
+                        })
+                    }, num * 15 + 150)
+                    num += 1
                 }
             }
         },
     },
     mounted() {
-        let player_1 = document.getElementById("video_1");
-        let stream_1 = "http://10.10.10.241/flv?port=1985&app=myapp&stream=testv";
-        this.play_stream(stream_1, player_1);
-        this.monitorWebsocket(); // websocket 监听事件
-        let ws = wsEvent.start(this.ptzWebSocket);
-
+        let player_1 = document.getElementById('video_1')
+        let stream_1 = 'http://10.10.10.241/flv?port=1985&app=myapp&stream=testv'
+        this.play_stream(stream_1, player_1)
+        this.monitorWebsocket() // websocket 监听事件
+        let ws = wsEvent.start(this.ptzWebSocket)
     },
 
     created() {
         // //页面刚进入时开启长连接
-        this.initWebSocket();
+        this.initWebSocket()
     },
     destroyed() {
-        console.log("切换页面关闭连接");
-        this.isDestroyed = true;
-        this.ws.close();
+        console.log('切换页面关闭连接')
+        this.isDestroyed = true
+        this.ws.close()
         //页面销毁时关闭长连接
         // this.wsReconnect();
         // window.addEventListener('beforeunload', e => this.wsReconnect(e))
         wsEvent.end(ws)
     },
     beforeDestroy() {
-        this.isDestroyed = true;
-        this.ws.close();
+        this.isDestroyed = true
+        this.ws.close()
         // window.addEventListener('beforeunload', e => this.wsReconnect())
     },
 }
@@ -1375,7 +1409,6 @@ export default {
     color: #fff;
 }
 
-
 .left .left-bottom {
     width: 99%;
     height: 23%;
@@ -1423,7 +1456,6 @@ export default {
     margin-left: 2%;
     margin-top: 2%;
     border-radius: 5px;
-
 }
 
 .right .right-top .PTZ-botton {
@@ -1599,7 +1631,6 @@ export default {
     background-color: #0b3d51;
     border-bottom: 0.1px solid #00b0f0;
     color: #fff;
-
 }
 
 .dialogPrint>>>.el-table__empty-block {
@@ -1645,7 +1676,6 @@ export default {
 .TrackIdparaDialog>>>.el-form-item__label {
     color: #fff;
     width: 40%;
-
 }
 
 .TrackIdparaDialog>>>.el-form-item {
@@ -1656,7 +1686,7 @@ export default {
     width: 40%;
     /* display: flex; */
     margin-left: 2%;
-    color: #fff
+    color: #fff;
 }
 
 .TrackIdparaBtn {
@@ -1754,7 +1784,6 @@ export default {
 .selected-list>>>.el-scrollbar__wrap::-webkit-scrollbar {
     width: 100%;
     height: 100%;
-
 }
 
 .right .right-bottom .center-box .default-list .selected-list .table-add {
@@ -1767,5 +1796,22 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.event-img-list {
+    /* display: flex; */
+    /* justify-content: 
+  ; */
+    /* justify-content: space-evenly; */
+    height: 100%;
+}
+
+.img-box {
+    overflow: hidden;
+    height: 100%;
+}
+
+.img-box img {
+    height: 100%;
 }
 </style>
