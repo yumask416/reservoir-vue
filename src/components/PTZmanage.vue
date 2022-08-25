@@ -84,6 +84,7 @@
                             <span>云台</span>
                         </div> -->
                         <div class="bottons">
+                            <!-- 焦距方向盘 -->
                             <div class="bottons-left">
                                 <div class="row">
                                     <div class="item" @mousedown="ControlPTZ('q')" @mouseup="ControlStop()">
@@ -130,6 +131,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- input等 -->
                             <div class="bottons-right">
                                 <div class="bottons-right-one">
                                     <el-input size="small" v-model="ptzconfig.ip" placeholder="IP"></el-input>
@@ -140,27 +142,28 @@
                                 <div class="bottons-right-one">
                                     <el-input size="small" v-model="ptzconfig.password" placeholder="IPC密码"></el-input>
                                 </div>
-                                <div class="bottons-right-one">
-                                    <el-select size="small" v-model="choosetrackmodule" placeholder="选择跟踪方式" clearable>
-                                        <el-option v-for="item in choosetrackoptions" :key="item.value"
-                                            :label="item.label" :value="item.value"></el-option>
-                                    </el-select>
+                                <div class="bottons-right-two" @click="GetUrlPTZ()">
+                                    <span>添加球机</span>
                                 </div>
-                                <div class="bottons-right-one">
-                                    <el-input size="small" v-model="autotrackid" placeholder="请输入跟踪ID" clearable>
-                                    </el-input>
+                                <div class="bottons-right-two" @click="ListCamera()">
+                                    <span>删除球机</span>
                                 </div>
 
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- 选择跟踪方式/请输入跟踪ID -->
                 <div class="ctrl-bottons">
-                    <div class="bottons-right-two" @click="GetUrlPTZ()">
-                        <span>添加球机</span>
+                    <div class="bottons-right-three">
+                        <el-select size="small" v-model="choosetrackmodule" placeholder="选择跟踪方式" clearable>
+                            <el-option v-for="item in choosetrackoptions" :key="item.value" :label="item.label"
+                                :value="item.value"></el-option>
+                        </el-select>
                     </div>
-                    <div class="bottons-right-two" @click="ListCamera()">
-                        <span>删除球机</span>
+                    <div class="bottons-right-three">
+                        <el-input size="small" v-model="autotrackid" placeholder="请输入跟踪ID" clearable>
+                        </el-input>
                     </div>
                 </div>
                 <div class="ctrl-botton">
@@ -235,7 +238,8 @@
                             </el-table>
                         </el-dialog>
                     </template>
-                    <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
+                    <!-- 更改跟踪方式 -->
+                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
                     <!-- 添加巡航线 -->
                     <div class="button" @click="printPreset(), cruiseLineVisible = true"><span>添加巡航线</span></div>
                     <template>
@@ -332,7 +336,8 @@
                             </el-form>
                         </el-dialog>
                     </template>
-                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
+                    <!-- 目标跟踪开关 -->
+                    <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
                 </div>
             </div>
             <div class="right-bottom">
@@ -417,12 +422,12 @@ export default {
     name: "PTZmanage",
     data() {
         return {
-            ImgInfo: { imgPath: "/static/images/camera_default.png" },
+            ImgInfo: { imgPath: "" },
             WarningImgInfo: {
-                warningimgpath1: "../../static/images/camera_default.png",
-                warningimgpath2: "../../static/images/camera_default.png",
-                warningimgpath3: "../../static/images/camera_default.png",
-                warningimgpath4: "../../static/images/camera_default.png"
+                warningimgpath1: "",
+                warningimgpath2: "",
+                warningimgpath3: "",
+                warningimgpath4: ""
             },
             CruiseLine: '巡航线',
             WarningImgIndex: [false, false, false, false],
@@ -532,8 +537,11 @@ export default {
     },
     methods: {
         ptzWebSocket(val) {
-            // console.log('val',val.data);
-            // this.ImgInfo.imgPath = val.data
+            let data=JSON.parse(val.data)
+            // console.log('val',data);
+            
+            // console.log('val',val.data.image_path);
+            this.ImgInfo.imgPath = 'http://10.10.10.226:10225/'+data.image_path
         },
         tableRowStyle({ row, rowIndex }) {
             return "padding: 0px;font-size:0.8vw;text-align: center;background-color: #15718E;border-bottom: 1px solid #3DBAF1;color: #fff;";
@@ -758,9 +766,9 @@ export default {
             if (this.istruefalse) {
                 ptzdownControl({ ptz_send_msg: "star" }).then(res => {
                     this.istruefalse = false;
-                    let data = res.data;
-                    if (data.code == 2200) {
+                    if (res.code == 2200) {
                         console.log("成功");
+                        this.$message.success("目标跟踪已开启");
                     } else {
                         console.log("失败");
                     }
@@ -768,9 +776,10 @@ export default {
             } else {
                 ptzdownControl({ ptz_send_msg: "end" }).then(res => {
                     this.istruefalse = true;
-                    let data = res.data;
-                    if (data.code == 2200) {
+                    // let data = res.data;
+                    if (res.code == 2200) {
                         console.log("成功");
+                        this.$message.info("目标跟踪已关闭");
                     } else {
                         console.log("失败");
                     }
@@ -780,9 +789,10 @@ export default {
         // 更改跟踪方式
         downSendTrackIdInfo() {
             ptzdownControl({ ptz_track_id_msg: this.autotrackid, ptz_track_mode_msg: this.choosetrackmodule }).then(res => {
-                let data = res.data;
-                if (data.code == 2200) {
+                // let data = res.data;
+                if (res.code == 2200) {
                     console.log("成功");
+                    this.$message.success("跟踪方式已更改");
                 } else {
                     console.log("失败");
                 }
@@ -1498,6 +1508,22 @@ export default {
 }
 
 /* 添加/删除球机 */
+.right .right-top .bottons-right .bottons-right-two {
+    /* height: 80%; */
+    width: 100%;
+    background-color: #0b3d51;
+    text-align: center;
+    padding: 4% 0;
+    border-radius: 4px;
+    margin-bottom: 2%;
+}
+
+.right .right-top .bottons-right .bottons-right-two:hover {
+    color: #00b0f0;
+    background-color: #15718e;
+}
+
+/* 选择跟踪方式/请输入跟踪ID */
 .right .right-top .ctrl-bottons {
     display: flex;
     justify-content: space-around;
@@ -1506,19 +1532,9 @@ export default {
     color: #fff;
 }
 
-.right .right-top .ctrl-bottons .bottons-right-two {
-    /* height: 80%; */
+.right .right-top .bottons-right-three {
     width: 45%;
-    background-color: #0b3d51;
-    text-align: center;
-    padding: 1.5% 0;
-    border-radius: 4px;
     margin-bottom: 2%;
-}
-
-.right .right-top .ctrl-bottons .bottons-right-two:hover {
-    color: #00b0f0;
-    background-color: #15718e;
 }
 
 /* 增加预置点等按钮 */
@@ -1572,9 +1588,9 @@ export default {
     justify-content: center;
 }
 
-.ctrl-botton>>>.el-select {
+/* .ctrl-botton>>>.el-select {
     width: 100%;
-}
+} */
 
 /* 显示预置点弹窗 */
 .dialogPrint>>>.el-table tr,
