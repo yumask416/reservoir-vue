@@ -75,7 +75,7 @@ import ajax from 'axios'
 import * as API from '@/api/event/'
 import * as CAMERAAPI from '@/api/camera/'
 import { Notification } from 'element-ui'
-import { wsEvent } from '../service/ws-api'
+// import { wsEvent } from '../service/ws-api'
 
 export const download = (data, name) => {
   let fileName = name
@@ -95,7 +95,7 @@ export default {
   name: 'HistoryEvent',
   data() {
     return {
-      ws: null,
+      // ws: null,
       event_val: '全部',
       event_opt: [
         {
@@ -146,20 +146,7 @@ export default {
         },
       ],
       camera_map: new Map(),
-      table_tr: [
-        {
-          imgPath: 1,
-          eventType: '入侵检测',
-          channel: 2,
-          time: 3,
-        },
-        {
-          imgPath: 1,
-          eventType: '入侵检测',
-          channel: 2,
-          time: 3,
-        },
-      ],
+      table_tr: [],
       pickerOptions: {
         shortcuts: [
           {
@@ -207,19 +194,33 @@ export default {
 
   async mounted() {
     // TODO
-    let res = await API.getEvent()
-    console.log(res)
-    res = res.data.list
-    if (res) {
-      table_tr = res.map(item => {
+    try {
+      let res = await API.getEvent()
+      res = res.data.list
+      console.log(res)
+      this.table_tr = res.map(item => {
         return {
-          imgPath: item.image_path,
-          eventType: '入侵检测',
-          channel: item.camera_id,
+          imgPath: '/' + item.image_path,
+          eventType: '入侵检测-人员',
+          channel: '通道' + item.camera_id,
           time: item.timestamp,
         }
       })
+    } catch (e) {
+      console.log(e)
     }
+    // console.log(res)
+    // res = res.data.list
+    // if (res) {
+    //   table_tr = res.map(item => {
+    //     return {
+    //       imgPath: item.image_path,
+    //       eventType: '入侵检测',
+    //       channel: item.camera_id,
+    //       time: item.timestamp,
+    //     }
+    //   })
+    // }
 
     // this.event_map.set('Y00', '全部')
     // this.event_map.set('Y01', '人员离岗')
@@ -274,23 +275,23 @@ export default {
     this.SearchClick()
   },
   methods: {
-    wsMsgHandler: function(e) {
-      // if (!e.data) {
-      //   return
-      // }
-      let data = JSON.parse(e.data)
-      console.log(data)
-      if (data.is_warning) {
-        console.log(data.is_warning)
-        //   // TODO push into array
-        this.table_tr.push({
-          imgPath: '/' + data.image_path,
-          eventType: '人员离岗',
-          channel: '204',
-          time: data.timestamp,
-        })
-      }
-    },
+    // wsMsgHandler: function(e) {
+    //   // if (!e.data) {
+    //   //   return
+    //   // }
+    //   let data = JSON.parse(e.data)
+    //   console.log(data)
+    //   if (data.is_warning) {
+    //     console.log(data.is_warning)
+    //     //   // TODO push into array
+    //     this.table_tr.push({
+    //       imgPath: '/' + data.image_path,
+    //       eventType: '人员离岗',
+    //       channel: '204',
+    //       time: data.timestamp,
+    //     })
+    //   }
+    // },
     // 提示弹窗
     notify: function(title, msg, err_type) {
       Notification({ title: title, message: msg, type: err_type })
@@ -322,37 +323,37 @@ export default {
         start_time: this.start_time,
         end_time: this.end_time,
       }
-      API.getEvent(param)
-        .then(res => {
-          if (res['code'] === 2200) {
-            _this.total = res.data.total
-            _this.table_tr = []
+      // API.getEvent(param)
+      //   .then(res => {
+      //     if (res['code'] === 2200) {
+      //       _this.total = res.data.total
+      //       _this.table_tr = []
 
-            if (res.data.page_size === 0) {
-              _this.$message.warning('没有搜索出数据！')
-            } else {
-              for (let i = 0; i < res.data.page_size; i++) {
-                console.log('run push')
+      //       if (res.data.page_size === 0) {
+      //         _this.$message.warning('没有搜索出数据！')
+      //       } else {
+      //         for (let i = 0; i < res.data.page_size; i++) {
+      //           console.log('run push')
 
-                _this.table_tr.push({
-                  imgPath: '/' + res.data.list[i]['image_path'],
-                  // eventType: _this.event_map.get(data.data.list[i]["Type"]),
-                  eventType: res.data.list[i]['event_type'],
-                  channel: _this.camera_map.get(res.data.list[i]['camera_id']),
-                  // time: moment(res.data.list[i]["CreatedAt"]).format('YYYY-MM-DD HH:mm:ss'),
-                  time: res.data.list[i]['timestamp'],
-                })
-              }
-            }
-            sucess
-          } else if (res['code'] === 4404) {
-            // _this.notify("搜索成功", res["msg"], "sucess");
-            _this.table_tr = []
-          } else {
-            _this.notify('搜索失败', res['msg'], 'error')
-          }
-        })
-        .catch(error => console.log(error))
+      //           _this.table_tr.push({
+      //             imgPath: '/' + res.data.list[i]['image_path'],
+      //             // eventType: _this.event_map.get(data.data.list[i]["Type"]),
+      //             eventType: res.data.list[i]['event_type'],
+      //             channel: _this.camera_map.get(res.data.list[i]['camera_id']),
+      //             // time: moment(res.data.list[i]["CreatedAt"]).format('YYYY-MM-DD HH:mm:ss'),
+      //             time: res.data.list[i]['timestamp'],
+      //           })
+      //         }
+      //       }
+      //       sucess
+      //     } else if (res['code'] === 4404) {
+      //       // _this.notify("搜索成功", res["msg"], "sucess");
+      //       _this.table_tr = []
+      //     } else {
+      //       _this.notify('搜索失败', res['msg'], 'error')
+      //     }
+      //   })
+      //   .catch(error => console.log(error))
     },
     /**
      * @return {boolean}
@@ -445,9 +446,9 @@ export default {
         .catch(error => console.log(error))
     },
   },
-  beforeDestory() {
-    wsEvent.end(this.ws)
-  },
+  // beforeDestory() {
+  //   wsEvent.end(this.ws)
+  // },
 }
 </script>
 

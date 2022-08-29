@@ -16,7 +16,7 @@ Vue.prototype.$notify = Notification;
 Vue.use(ElementUI);
 Vue.use(VueAreaLinkage)
 Vue.config.productionTip = false;
-ajax.defaults.baseURL = 'http://127.0.0.1:10225';
+// ajax.defaults.baseURL = 'http://127.0.0.1:10225';
 // ajax.defaults.baseURL = 'http://10.10.10.119:10225';
 // ajax.defaults.baseURL = 'http://10.10.10.226:10225';
 // ajax.defaults.baseURL = 'http://10.10.10.101:4000';

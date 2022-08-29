@@ -3,25 +3,26 @@
         <div class="left">
             <div class="left-top">
                 <div class="title">
-                    <div class="curent-msg">
+                    <!-- <div class="curent-msg">
                         <div class="msg-box" style="width: 40%">
                             <span>当前巡航线：</span><span>{{ CruiseLine }}</span>
                         </div>
-                        <div class="msg-box" style="width: 60%">
+                        <div class="msg-box" style="
+                        width: 60%">
                             <span>当前预置点：</span><span>东南角预置点</span>
                         </div>
-                    </div>
+                    </div> -->
                     <h3>云台时况</h3>
                 </div>
                 <div class="bigimg">
-                    <div class="switch">
+                    <!-- <div class="switch">
                         <el-switch style="display: block" v-model="isBigImg" active-color="#409EFF"
                             inactive-color="#409EFF" active-text="大图模式" inactive-text="信息模式">
                         </el-switch>
-                    </div>
-                    <div class="allimg" v-show="!isBigImg">
+                    </div> -->
+                    <!-- <div class="allimg" v-show="!isBigImg">
                         <img src="../../static/images/camera_default.png" alt="" />
-                    </div>
+                    </div> -->
                     <div class="img-div">
                         <img :src="ImgInfo.imgPath" class="image-img" alt="" width="100%" height="100%" />
                     </div>
@@ -136,9 +137,9 @@
                                 <div class="bottons-right-two" @click="GetUrlPTZ()">
                                     <span>添加球机</span>
                                 </div>
-                                <div class="bottons-right-two" @click="ListCamera()">
+                                <!-- <div class="bottons-right-two" @click="ListCamera()">
                                     <span>删除球机</span>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -156,7 +157,20 @@
                         </el-input>
                     </div>
                 </div>
+                <!-- 按钮 -->
                 <div class="ctrl-botton">
+                    <div class="autoBtn">
+                        <el-switch style="display: block" v-model="autoVisible" active-color="#409EFF"
+                            inactive-color="#409EFF" active-text="自动" inactive-text="手动" @change="downsendInfo">
+                        </el-switch>
+                    </div>
+                    <div class="autoBtn">
+                        <el-switch style="display: block" v-model="smartVisible" active-color="#409EFF"
+                            inactive-color="#409EFF" active-text="智能" @change="downsendInfo2">
+                        </el-switch>
+                    </div>
+                    <!-- 更改跟踪方式 -->
+                    <div class="buttons" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
                     <!-- 增加预置点 -->
                     <div class="button" @click="printPreset(), (dialogPresetVisible = true)">
                         <span>增加预置点</span>
@@ -232,8 +246,6 @@
                             </el-table>
                         </el-dialog>
                     </template>
-                    <!-- 更改跟踪方式 -->
-                    <div class="button" @click="downSendTrackIdInfo()"><span>更改跟踪方式</span></div>
                     <!-- 添加巡航线 -->
                     <div class="button" @click="printPreset(), (cruiseLineVisible = true)">
                         <span>添加巡航线</span>
@@ -257,67 +269,83 @@
                         </el-dialog>
                     </template>
                     <!-- 更改跟踪参数 -->
-                    <div class="button" @click="trackIdparaVisible = true"><span>更改跟踪参数</span></div>
+                    <div class="button" @click="trackIdparaVisible = true"><span>更改跟踪参数</span>
+                    </div>
                     <template>
                         <el-dialog class="TrackIdparaDialog" :visible.sync="trackIdparaVisible" title="更改跟踪参数"
                             width="50%">
                             <el-form ref="form" :model="form">
                                 <el-form-item label="累计帧数缩放图像阈值">
                                     <el-input v-model="form.large_small_count_threshold" size="small"
-                                        placeholder="请输入累计帧数缩放图像阈值"></el-input>
+                                        placeholder="请输入累计帧数缩放图像阈值" 
+                                        oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
+                                    </el-input>
                                 </el-form-item>
                                 <el-form-item label="累计帧数移动云台阈值">
                                     <el-input v-model="form.autotrack_move_count_threshold" size="small"
-                                        placeholder="请输入累计帧数移动云台阈值"></el-input>
+                                        placeholder="请输入累计帧数移动云台阈值" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
+                                    </el-input>
                                 </el-form-item>
                                 <el-form-item label=" 图像放大宽阈值">
-                                    <el-input v-model="form.width_large_threshold" size="small"
-                                        placeholder="请输入图像放大宽阈值"></el-input>
+                                    <el-input v-model="form.width_large_threshold" size="small" placeholder="请输入图像放大宽阈值"
+                                        oninput="value=value.replace(/[^\d.]/g,'')" @input="widthChanges"></el-input>
                                 </el-form-item>
                                 <el-form-item label="图像放大高阈值">
                                     <el-input v-model="form.height_large_threshold" size="small"
-                                        placeholder="请输入图像放大高阈值"></el-input>
+                                        placeholder="请输入图像放大高阈值" oninput="value=value.replace(/[^\d.]/g,'')" @input="heightChanges"></el-input>
                                 </el-form-item>
                                 <el-form-item label="图像放大面积阈值">
-                                    <el-input v-model="form.area_large_threshold" size="small"
-                                        placeholder="请输入图像放大面积阈值"></el-input>
+                                    <el-input v-model="form.area_large_threshold" size="small" placeholder="请输入图像放大面积阈值"
+                                        oninput="value=value.replace(/[^\d.]/g,'')"></el-input>
                                 </el-form-item>
                                 <el-form-item label="图像缩小宽阈值">
-                                    <el-input v-model="form.width_small_threshold" size="small"
-                                        placeholder="请输入图像缩小宽阈值"></el-input>
+                                    <el-input v-model="form.width_small_threshold" size="small" placeholder="请输入图像缩小宽阈值"
+                                        oninput="value=value.replace(/[^\d.]/g,'')"></el-input>
                                 </el-form-item>
                                 <el-form-item label="图像缩小高阈值">
                                     <el-input v-model="form.height_small_threshold" size="small"
-                                        placeholder="请输入图像缩小高阈值"></el-input>
+                                        placeholder="请输入图像缩小高阈值" oninput="value=value.replace(/[^\d.]/g,'')"></el-input>
                                 </el-form-item>
                                 <el-form-item label="图像缩小面积阈值">
-                                    <el-input v-model="form.area_small_threshold" size="small"
-                                        placeholder="请输入图像缩小面积阈值"></el-input>
+                                    <el-input v-model="form.area_small_threshold" size="small" placeholder="请输入图像缩小面积阈值"
+                                        oninput="value=value.replace(/[^\d.]/g,'')"></el-input>
+                                </el-form-item>
+                                <el-form-item label="巡航时间">
+                                    <el-input v-model="form.time_time_track_var_four" size="small"
+                                        placeholder="请输入图像缩小面积阈值" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
+                                    </el-input>
                                 </el-form-item>
                                 <el-form-item label="无目标时超时复位时间">
                                     <el-input v-model="form.time_track_var_three" size="small"
-                                        placeholder="请输入无目标时超时复位时间"></el-input>
+                                        placeholder="请输入无目标时超时复位时间" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
+                                    </el-input>
                                 </el-form-item>
                                 <el-form-item label="有目标时超时抓拍返回巡航时间">
                                     <el-input v-model="form.time_track_var_one" size="small"
-                                        placeholder="请输入有目标时超时抓拍返回巡航时间"></el-input>
+                                        placeholder="请输入有目标时超时抓拍返回巡航时间" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
+                                    </el-input>
                                 </el-form-item>
                                 <el-form-item label="抓拍后延时时间">
-                                    <el-input v-model="form.time_track_var_two" size="small" placeholder="请输入抓拍后延时时间">
+                                    <el-input v-model="form.time_track_var_two" size="small" placeholder="请输入抓拍后延时时间"
+                                        oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
                                     </el-input>
                                 </el-form-item>
                                 <el-form-item label="移动速度">
-                                    <el-input v-model="form.moveSpeed" size="small" placeholder="请输入移动速度"></el-input>
+                                    <el-input v-model="form.moveSpeed" size="small" placeholder="请输入移动速度"
+                                        oninput="value=value.replace(/[^\d.]/g,'')"></el-input>
                                 </el-form-item>
                                 <el-form-item label="变焦速度">
-                                    <el-input v-model="form.focalSpeed" size="small" placeholder="请输入变焦速度"></el-input>
+                                    <el-input v-model="form.focalSpeed" size="small" placeholder="请输入变焦速度"
+                                        oninput="value=value.replace(/[^\d.]/g,'')"></el-input>
                                 </el-form-item>
                                 <el-form-item label="移动延时">
-                                    <el-input v-model="form.moveDelayTime" size="small" placeholder="请输入移动延时">
+                                    <el-input v-model="form.moveDelayTime" size="small" placeholder="请输入移动延时"
+                                        oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
                                     </el-input>
                                 </el-form-item>
                                 <el-form-item label="变焦延时">
-                                    <el-input v-model="form.focalDelayTime" size="small" placeholder="请输入变焦延时">
+                                    <el-input v-model="form.focalDelayTime" size="small" placeholder="请输入变焦延时"
+                                        oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
                                     </el-input>
                                 </el-form-item>
                                 <el-form-item class="TrackIdparaBtn">
@@ -329,7 +357,7 @@
                         </el-dialog>
                     </template>
                     <!-- 目标跟踪开关 -->
-                    <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div>
+                    <!-- <div class="button" @click="downsendInfo()"><span>目标跟踪开关</span></div> -->
                 </div>
             </div>
             <div class="right-bottom">
@@ -353,7 +381,7 @@
                                             <span v-if="!scope.row.show">{{ scope.row.token }}</span>
                                         </template> -->
                                     </el-table-column>
-                                    <el-table-column prop="name" label="预设点名称" width="90" align="center"
+                                    <el-table-column prop="name" label="预设点名称" width="150" align="center"
                                         show-overflow-tooltip>
                                         <!-- <template slot-scope="scope">
                                             <el-input size="small" v-model="scope.row.name" v-show="scope.row.show"
@@ -433,6 +461,8 @@ export default {
             timeoutnum: null, //断开 重连倒计时
             reconnect_num: 0, // 重连次数
             isDestroyed: false, // 关闭或切换页面，是否断开
+            smartVisible: false,
+            autoVisible: false,
 
             dialogPresetVisible: false, //添加预置点
             PresetVisible: false, //显示预置点
@@ -453,6 +483,7 @@ export default {
             istruefalse: true,
             checkList: [],
             trackIdparaVisible: false, //更改跟踪参数
+            max: 0.42,
             form: {
                 large_small_count_threshold: 1,
                 autotrack_move_count_threshold: 3,
@@ -462,6 +493,7 @@ export default {
                 width_small_threshold: undefined,
                 height_small_threshold: undefined,
                 area_small_threshold: undefined,
+                time_time_track_var_four: 300,
                 time_track_var_three: 30,
                 time_track_var_one: 60,
                 time_track_var_two: 7,
@@ -538,17 +570,18 @@ export default {
     },
     methods: {
         ptzWebSocket(val) {
-              let data = JSON.parse(val.data)
+            // console.log(11111111)
+            let data = JSON.parse(val.data)
             //   console.log('val', data)
 
             // console.log('val',val.data.image_path);
-            this.ImgInfo.imgPath = 'http://10.10.10.226:10225/' + data.image_path
+            this.ImgInfo.imgPath = '/' + data.image_path
 
             if (data.is_warning) {
                 if (!this.isLocked) {
                     this.isLocked = true
                     this.warnArr.push({
-                        imgpath: 'http://10.10.10.226:10225/' + data.image_path,
+                        imgpath: '/' + data.image_path,
                         time: data['timestamp'],
                         eventtype: data['event_type'],
                     })
@@ -799,25 +832,58 @@ export default {
             //   }
             // });
         },
-        // 目标跟踪开关
+        // 自动/手动切换
         downsendInfo() {
-            if (this.istruefalse) {
+            // console.log(123);
+            // this.autoVisible = true
+            if (this.autoVisible) {
+                console.log('this.autoVisible', this.autoVisible)
+                // 自动
                 ptzdownControl({ ptz_send_msg: 'star' }).then(res => {
-                    this.istruefalse = false
+
                     if (res.code == 2200) {
                         console.log('成功')
-                        this.$message.success('目标跟踪已开启')
+                        this.$message.success('已开启自动')
+                    } else {
+                        console.log('失败')
+                    }
+                })
+                // this.autoVisible = !this.autoVisible
+            } else {
+                console.log('this.autoVisible', this.autoVisible)
+                // 手动
+                ptzdownControl({ ptz_send_msg: 'end' }).then(res => {
+                    // this.autoVisible = true
+                    // let data = res.data;
+                    if (res.code == 2200) {
+                        console.log('成功')
+                        this.$message.success('已开启手动')
+                    } else {
+                        console.log('失败')
+                    }
+                })
+            }
+        },
+        downsendInfo2() {
+            // this.smartVisible = !this.smartVisible
+            //智能
+            if (this.smartVisible) {
+                ptzdownControl({ ptz_send_msg: 'star2' }).then(res => {
+                    // this.smartVisible = false
+                    if (res.code == 2200) {
+                        console.log('成功')
+                        this.$message.success('已开启智能')
                     } else {
                         console.log('失败')
                     }
                 })
             } else {
-                ptzdownControl({ ptz_send_msg: 'end' }).then(res => {
-                    this.istruefalse = true
+                ptzdownControl({ ptz_send_msg: 'end2' }).then(res => {
+                    // this.smartVisible = true
                     // let data = res.data;
                     if (res.code == 2200) {
                         console.log('成功')
-                        this.$message.info('目标跟踪已关闭')
+                        this.$message.info('已关闭智能')
                     } else {
                         console.log('失败')
                     }
@@ -840,6 +906,42 @@ export default {
             })
         },
         // 更改跟踪参数
+        widthChanges(value) {
+            if (value > this.max) {
+                this.form.width_large_threshold = this.max;
+            }
+        },
+        heightChanges(value) {
+            if (value > this.max) {
+                this.form.height_large_threshold = this.max
+            }
+        },
+        downSendTrackIdpara() {
+            TrackIdparaControl({
+                ptz_par_lsct_msg: this.form.large_small_count_threshold,
+                ptz_par_amct_msg: this.form.autotrack_move_count_threshold,
+                ptz_par_wlt_msg: this.form.width_large_threshold,
+                ptz_par_hlt_msg: this.form.height_large_threshold,
+                ptz_par_alt_msg: this.form.area_large_threshold,
+                ptz_par_wst_msg: this.form.width_small_threshold,
+                ptz_par_hst_msg: this.form.height_small_threshold,
+                ptz_par_ast_msg: this.form.area_small_threshold,
+                ptz_par_ttvfour_msg: this.form.time_time_track_var_four,
+                ptz_par_ttvthree_msg: this.form.time_track_var_three,
+                ptz_par_ttvone_msg: this.form.time_track_var_one,
+                ptz_par_ttvtwo_msg: this.form.time_track_var_two,
+                ptz_par_move_speed_msg: this.form.moveSpeed,
+                ptz_par_focal_speed_msg: this.form.focalSpeed,
+                ptz_par_move_delay_time_msg: this.form.moveDelayTime,
+                ptz_par_focal_delay_time_msg: this.form.focalDelayTime
+            }).then(res => {
+                if (res.code == 2200) {
+                    this.$message.success('发送成功')
+                } else {
+                    // this.$message.wa rning(res.msg);
+                }
+            })
+        },
         onSubmit() {
             console.log('submit!')
         },
@@ -977,21 +1079,10 @@ export default {
             this.checkAll = checkedCount === this.presetinfotableData2.length
             this.isIndeterminate = checkedCount > 0 && checkedCount < this.presetinfotableData2.length
         },
-        // 更改跟踪参数
-        downSendTrackIdpara() {
-            // ajax.get("", { params: {} }).then(function (res) { }).catch(function (error) { console.log(error); });
-            TrackIdparaControl({ ptzsend: '123' }).then(res => {
-                if (res.code == 2200) {
-                    this.$message.success('发送成功')
-                } else {
-                    // this.$message.warning(res.msg);
-                }
-            })
-        },
         ControlStop() {
             ptzsendControl({ ptz: 's' }).then(res => {
                 if (res.code == 2200) {
-                    this.$message.success('发送成功')
+                    // this.$message.success('发送成功')
                 } else {
                     this.$message.warning(res.msg)
                 }
@@ -1003,7 +1094,7 @@ export default {
                 case 'a':
                     ptzsendControl({ ptz: 'a' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1012,7 +1103,7 @@ export default {
                 case 'd':
                     ptzsendControl({ ptz: 'd' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1021,7 +1112,7 @@ export default {
                 case 'q':
                     ptzsendControl({ ptz: 'q' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1030,7 +1121,7 @@ export default {
                 case 'w':
                     ptzsendControl({ ptz: 'w' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1039,7 +1130,7 @@ export default {
                 case 'e':
                     ptzsendControl({ ptz: 'e' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1048,7 +1139,7 @@ export default {
                 case 'z':
                     ptzsendControl({ ptz: 'z' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1057,7 +1148,7 @@ export default {
                 case 'x':
                     ptzsendControl({ ptz: 'x' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1066,7 +1157,7 @@ export default {
                 case 'c':
                     ptzsendControl({ ptz: 'c' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1075,7 +1166,7 @@ export default {
                 case '1':
                     ptzsendControl({ ptz: '1' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1084,7 +1175,7 @@ export default {
                 case '2':
                     ptzsendControl({ ptz: '2' }).then(res => {
                         if (res.code == 2200) {
-                            this.$message.success('发送成功')
+                            // this.$message.success('发送成功')
                         } else {
                             this.$message.warning(res.msg)
                         }
@@ -1106,7 +1197,7 @@ export default {
                     //建立连接
                     this.ws = new WebSocket(wsuri)
                 }
-                this.monitorWebsocket()
+                // this.monitorWebsocket()
             } catch (e) {
                 this.wsReconnect()
             }
@@ -1244,26 +1335,27 @@ export default {
         let player_1 = document.getElementById('video_1')
         let stream_1 = 'http://10.10.10.241/flv?port=1985&app=myapp&stream=testv'
         this.play_stream(stream_1, player_1)
-        this.monitorWebsocket() // websocket 监听事件
-        let ws = wsEvent.start(this.ptzWebSocket)
+        // this.monitorWebsocket() // websocket 监听事件
+        this.ws = wsEvent.start(this.ptzWebSocket)
     },
 
     created() {
         // //页面刚进入时开启长连接
-        this.initWebSocket()
+        // this.initWebSocket()
     },
     destroyed() {
         console.log('切换页面关闭连接')
         this.isDestroyed = true
-        this.ws.close()
+        // this.ws.close()
         //页面销毁时关闭长连接
         // this.wsReconnect();
         // window.addEventListener('beforeunload', e => this.wsReconnect(e))
-        wsEvent.end(ws)
+        // wsEvent.end(ws)
     },
     beforeDestroy() {
         this.isDestroyed = true
-        this.ws.close()
+        wsEvent.end(this.ws)
+        // this.ws.close()
         // window.addEventListener('beforeunload', e => this.wsReconnect())
     },
 }
@@ -1451,7 +1543,7 @@ export default {
 /* right-top */
 .right .right-top {
     width: 94%;
-    height: 49%;
+    height: 54%;
     background-color: rgba(4, 30, 43, 0.8);
     margin-left: 2%;
     margin-top: 2%;
@@ -1572,12 +1664,69 @@ export default {
 /* 增加预置点等按钮 */
 .right .right-top .ctrl-botton {
     width: 100%;
-    height: 13%;
+    height: 11%;
     background-color: #041e2b;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
 }
+
+.right .right-top .ctrl-botton .buttons {
+    width: 30%;
+    height: 80%;
+    color: #fff;
+    border-radius: 3px;
+    background-color: #0b3d51;
+    margin-bottom: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.right .right-top .ctrl-botton .button {
+    width: 47%;
+    height: 80%;
+    color: #fff;
+    border-radius: 3px;
+    background-color: #0b3d51;
+    margin-bottom: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.right .right-top .ctrl-botton .button:hover {
+    color: #00b0f0;
+    background-color: #15718e;
+}
+
+.right .right-top .ctrl-botton>>>.el-switch__label * {
+    color: #fff;
+}
+
+.ctrl-botton .autoBtn {
+    /* width: 100%; */
+    height: 72%;
+    /* background-color: #0b3d51; */
+    border-radius: 3px;
+    padding-top: 1%;
+    /* vertical-align: middle; */
+    display: flex;
+    align-content: center;
+
+}
+
+.ctrl-botton>>>.el-switch__label--left {
+    margin-right: 4px;
+}
+
+.ctrl-botton>>>.el-switch__label--right {
+    margin-left: 4px;
+}
+
+/* .el-switch */
 
 /* 增加预置点弹窗 */
 .add_preset_style {
@@ -1651,24 +1800,6 @@ export default {
     color: #fff;
 }
 
-.right .right-top .ctrl-botton .button {
-    width: 30%;
-    height: 80%;
-    color: #fff;
-    border-radius: 3px;
-    background-color: #0b3d51;
-    margin-bottom: 2%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-.right .right-top .ctrl-botton .button:hover {
-    color: #00b0f0;
-    background-color: #15718e;
-}
-
 /* 更改跟踪参数 */
 /* .TrackIdparaDialog>>> .el-form{
     margin: 0 auto;
@@ -1699,7 +1830,7 @@ export default {
 /* 巡航线header  */
 .right .right-bottom {
     width: 98%;
-    height: 50%;
+    height: 45%;
     border-radius: 5px;
     margin-left: 2%;
 }
@@ -1799,10 +1930,6 @@ export default {
 }
 
 .event-img-list {
-    /* display: flex; */
-    /* justify-content: 
-  ; */
-    /* justify-content: space-evenly; */
     height: 100%;
 }
 

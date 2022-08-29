@@ -11,6 +11,7 @@ import $ws from './ws'
 
 let { startWs, endWs } = $ws()
 export const wsEvent = {
-  start: (callback, url = 'ws://10.10.10.226:10225/api/v1/event/ws') => startWs(url, callback),
+  start: (callback, url = 'ws://'+window.location.host+'/api/v1/event/ws') => startWs(url, callback),
+  // start: (callback, url = 'ws://10.10.10.226:10225/api/v1/event/ws') => startWs(url, callback),
   end: ws => endWs(ws),
-}
+} 

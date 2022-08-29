@@ -12,24 +12,24 @@
             <div class="menu-div">
                 <h4 class="menu-h4">功能与服务</h4>
                 <div class="menu-guide">
-                    <div class="menu-cell" @click="ToSingle(0)" @mouseenter="BackGround(0)" @mouseleave="BackGroundOut(0)" v-bind:style="{background: MenuColor[0].color}"><span>实时告警</span></div>
+                    <!-- <div class="menu-cell" @click="ToSingle(0)" @mouseenter="BackGround(0)" @mouseleave="BackGroundOut(0)" v-bind:style="{background: MenuColor[0].color}"><span>实时告警</span></div> -->
                     <!-- <div class="menu-cell" @click="ToSecurity(1)" @mouseenter="BackGround(1)" @mouseleave="BackGroundOut(1)" v-bind:style="{background: MenuColor[1].color}"><span>安全卸油</span></div> -->
-                    <div class="menu-cell" @click="ToWarning(2)" @mouseenter="BackGround(2)" @mouseleave="BackGroundOut(2)" v-bind:style="{background: MenuColor[2].color}"><span>告警中心</span></div>
+                    <!-- <div class="menu-cell" @click="ToWarning(2)" @mouseenter="BackGround(2)" @mouseleave="BackGroundOut(2)" v-bind:style="{background: MenuColor[2].color}"><span>告警中心</span></div> -->
                     <div class="menu-cell" @click="ToHistory(3)" @mouseenter="BackGround(3)" @mouseleave="BackGroundOut(3)" v-bind:style="{background: MenuColor[3].color}"><span>历史事件</span></div>
                     <div class="menu-cell" @click="ToPTZ(4)" @mouseenter="BackGround(4)" @mouseleave="BackGroundOut(4)" v-bind:style="{background: MenuColor[4].color}"><span>云台球机</span></div>
                 </div>
                 <h4 class="menu-h4">配置与管理</h4>
                 <div class="menu-setting">
-                    <div class="menu-cell" @click="ToCamera(5)" @mouseenter="BackGround(5)" @mouseleave="BackGroundOut(5)" v-bind:style="{background: MenuColor[5].color}"><span>通道管理</span></div>
+                    <!-- <div class="menu-cell" @click="ToCamera(5)" @mouseenter="BackGround(5)" @mouseleave="BackGroundOut(5)" v-bind:style="{background: MenuColor[5].color}"><span>通道管理</span></div> -->
                     <div class="menu-cell" @click="ToNetwork(6)" @mouseenter="BackGround(6)" @mouseleave="BackGroundOut(6)" v-bind:style="{background: MenuColor[6].color}"><span>网络配置</span></div>
                     <div class="menu-cell" @click="ToReport(7)" @mouseenter="BackGround(7)" @mouseleave="BackGroundOut(7)" v-bind:style="{background: MenuColor[7].color}"><span>上报配置</span></div>
                     <div class="menu-cell" @click="ToSystemSetting(8)" @mouseenter="BackGround(8)" @mouseleave="BackGroundOut(8)" v-bind:style="{background: MenuColor[8].color}"><span>系统设置</span></div>
                 </div>
-                <h4 class="menu-h4">操作指南</h4>
+                <!-- <h4 class="menu-h4">操作指南</h4>
                 <div class="menu-guide">
                     <div class="menu-cell" @click="ToNo" @mouseenter="BackGround(9)" @mouseleave="BackGroundOut(9)" v-bind:style="{background: MenuColor[9].color}"><span>使用手册</span></div>
                     <div class="menu-cell" @click="ToNo" @mouseenter="BackGround(10)" @mouseleave="BackGroundOut(10)" v-bind:style="{background: MenuColor[10].color}"><span>操作视频</span></div>
-                </div>
+                </div> -->
             </div>
 
             <div class="main-show">
@@ -73,10 +73,10 @@
         },
         data() {
             return {
-                template: "SingleWarningVideo",
+                template: "PTZmanage",
                 // SystemTitle: "智慧加油站系统",
                 SystemTitle: "",
-                curr_title: "系统主页",
+                curr_title: "云台球机",
                 MenuColor : [
                     {
                         "color": "rgba(32, 160, 199, 0.64)"

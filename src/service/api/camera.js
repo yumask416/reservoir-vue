@@ -101,7 +101,7 @@ export async function ptzadd(data, url = cameraUrl.add) {
 export async function ptzlineControl(data, url = ptzUrl.ptzsend) {
 	return await fetchGet(url, data);
 }
-// 更改跟踪方式
-export async function TrackIdparaControl(data, url = ptzUrl.ptzsend) {
+// 更改跟踪参数
+export async function TrackIdparaControl(data, url = ptzUrl.ptzparameter) {
 	return await fetchGet(url, data);
 }
